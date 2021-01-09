@@ -10,9 +10,9 @@ public class GridManager : MonoBehaviour
 
     private GridCell[,,] grid;
 
-    private const int xDim = 10;
-    private const int yDim = 10;
-    private const int zDim = 10;
+    private const int xDim = 100;
+    private const int yDim = 100;
+    private const int zDim = 100;
 
     private float minX;
     private float maxX;
@@ -42,7 +42,7 @@ public class GridManager : MonoBehaviour
         cubeSize = range / xDim;
         step = cubeSize;
         center = cubeSize / 2;
-        //TestSpawning();
+        TestSpawning();
     }
 
     private void InitGrid()
@@ -77,9 +77,9 @@ public class GridManager : MonoBehaviour
     {
         for (int i = 0; i < 1; i+=2)
         {
-            for (int j = 1; j <= zDim; j+=3)
+            for (int j = 0; j < zDim; j+=2)
             {
-                for (int k = 0; k < xDim; k+=3)
+                for (int k = 0; k < xDim; k+=2)
                 {
                     Vector3 spawnPosition = new Vector3(k * step + minX + center, i * step + center, j * step + minZ + center);
                     GameObject block = Instantiate(blockPrefab, spawnPosition, Quaternion.identity);
@@ -100,6 +100,7 @@ public class GridManager : MonoBehaviour
 
         GameObject block = Instantiate(blockPrefab, spawnPosition, Quaternion.identity);
         block.GetComponent<Renderer>().material.color = new Color(Random.value, Random.value, Random.value);
+        block.transform.localScale = new Vector3(cubeSize, cubeSize, cubeSize);
     }
 
     public void DestroyBlock(int x, int y, int z)
@@ -116,12 +117,7 @@ public class GridManager : MonoBehaviour
 
     public Vector3 Idx2SpawnPosition(Vector3Int idx)
     {
-        return new Vector3(idx.x + minX + center, idx.y + center, idx.z + minZ + center);
-    }
-
-    public void DrawWireframeBlock(Vector3 spawnPosition)
-    {
-        Instantiate(wireframeBlockPrefab, spawnPosition, Quaternion.identity);
+        return new Vector3(idx.x + minX + center, idx.y + minY + center, idx.z + minZ + center);
     }
 
     public GameObject SnapWireframe(Vector3 position)
@@ -129,7 +125,9 @@ public class GridManager : MonoBehaviour
         // convert position to grid indices
         Vector3Int idx = World2Idx(position);
         Vector3 spawnPosition = Idx2SpawnPosition(idx);
-        return Instantiate(wireframeBlockPrefab, spawnPosition, Quaternion.identity);
+        GameObject block = Instantiate(wireframeBlockPrefab, spawnPosition, Quaternion.identity);
+        block.transform.localScale = new Vector3(cubeSize, cubeSize, cubeSize);
+        return block;
     }
 
     public bool CanSnap(Vector3 position)

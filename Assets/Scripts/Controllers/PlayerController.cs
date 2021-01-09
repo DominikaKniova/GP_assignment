@@ -11,7 +11,7 @@ public class PlayerController : MonoBehaviour
     private float jumpForce = 6.0f;
     private Vector3 direction;
 
-    public bool buildMode;
+    public bool buildMode = false;
     public bool isGrounded;
     private bool doJump;
 
@@ -101,6 +101,7 @@ public class PlayerController : MonoBehaviour
             switch (hit.collider.tag)
             {
                 case "Block":
+                    Debug.Log("hit: " + hit.point);
                     wireframeBlock = gridManager.SnapWireframe(hit.transform.position + hit.normal);
                     // get indices of intersecting block
 

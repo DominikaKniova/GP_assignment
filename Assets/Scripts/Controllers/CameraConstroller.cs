@@ -25,11 +25,7 @@ public class CameraConstroller : MonoBehaviour
     {
         horizontalInput = Input.GetAxis("Mouse X");
         verticalInput = Input.GetAxis("Mouse Y");
-    }
 
-    // Update is called once per frame
-    void FixedUpdate()
-    {
         yaw += speed * horizontalInput;
         pitch -= speed * verticalInput;
 

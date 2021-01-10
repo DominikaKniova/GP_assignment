@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class GridManager : MonoBehaviour
 {
-    public GameObject blockPrefab;
+    public GameObject[] blockPrefabs;
     public GameObject wireframeBlockPrefab;
     public GameObject ground;
 
@@ -28,7 +28,7 @@ public class GridManager : MonoBehaviour
 
     void Awake()
     {
-        InitGrid();
+        //InitGrid();
 
         List<Vector3> corners = GroundCorners();
         minX = -corners[0].x;
@@ -42,7 +42,8 @@ public class GridManager : MonoBehaviour
         cubeSize = range / xDim;
         step = cubeSize;
         center = cubeSize / 2;
-        RandomTerrain();
+
+        //RandomTerrain();
     }
 
     private void InitGrid()
@@ -75,29 +76,46 @@ public class GridManager : MonoBehaviour
 
     private void RandomTerrain()
     {
-        int[,] heightMap = TerrainManager.GenerateHeightMap(xDim, zDim, 20);
-
+        int[,] heightMap = TerrainManager.GenerateHeightMap(xDim, zDim, 10);
+        int minheight = 10000;
+        int maxheight = -1;
         for (int z = 0; z < zDim; z++)
         {
             for (int x = 0; x < xDim; x++)
             {
-                Vector3 spawnPosition = new Vector3(x * step + minX + center, heightMap[z,x] * step + center, z * step + minZ + center);
-                GameObject block = Instantiate(blockPrefab, spawnPosition, Quaternion.identity);
-                if (heightMap[z, x] <= TerrainManager.waterLevel)
+                for (int y = heightMap[z, x] - 1; y < heightMap[z, x]; y++)
                 {
-                    block.GetComponent<Renderer>().material.color = new Color(0, 0, 255);
+                    Vector3 spawnPosition = new Vector3(x * step + minX + center, y * step + minY + center, z * step + minZ + center);
+                    GameObject block = Instantiate(blockPrefabs[0], spawnPosition, Quaternion.identity);
+                    block.transform.localScale = new Vector3(cubeSize, cubeSize, cubeSize);
+
+                    if (y <= TerrainManager.waterLevel)
+                    {
+                        block.GetComponent<Renderer>().material.color = new Color(0, 0, 255);
+                    }
+                    else if (y <= TerrainManager.greeneryLevel)
+                    {
+                        //block.GetComponent<Renderer>().material.color = new Color(0, 255, 0);
+                        block.GetComponent<Renderer>().material.color = new Color(Random.value, Random.value, Random.value);
+                    }
+                    else
+                    {
+                        block.GetComponent<Renderer>().material.color = new Color(255, 255, 255);
+                    }
                 }
-                else if (heightMap[z, x] <= TerrainManager.greeneryLevel)
+
+                if (heightMap[z, x] < minheight)
                 {
-                    block.GetComponent<Renderer>().material.color = new Color(0, 255, 0);
+                    minheight = heightMap[z, x];
                 }
-                else
+                if (heightMap[z, x] > maxheight)
                 {
-                    block.GetComponent<Renderer>().material.color = new Color(255, 255, 255);
+                    maxheight = heightMap[z, x];
                 }
-                block.transform.localScale = new Vector3(cubeSize, cubeSize, cubeSize);
             }
         }
+        Debug.Log("min " + minheight);
+        Debug.Log("max " + maxheight);
     }
 
     private void TestSpawning()
@@ -109,7 +127,7 @@ public class GridManager : MonoBehaviour
                 for (int k = 0; k < xDim; k+=2)
                 {
                     Vector3 spawnPosition = new Vector3(k * step + minX + center, i * step + center, j * step + minZ + center);
-                    GameObject block = Instantiate(blockPrefab, spawnPosition, Quaternion.identity);
+                    GameObject block = Instantiate(blockPrefabs[0], spawnPosition, Quaternion.identity);
                     block.transform.localScale = new Vector3(cubeSize, cubeSize, cubeSize);
                 }
             }
@@ -120,20 +138,19 @@ public class GridManager : MonoBehaviour
     {
         Vector3Int idx = World2Idx(position);
 
-        grid[idx.x, idx.y, idx.z].occupied = true;
-        grid[idx.x, idx.y, idx.z].blockType = type;
+        //grid[idx.x, idx.y, idx.z].occupied = true;
+        //grid[idx.x, idx.y, idx.z].blockType = type;
 
         Vector3 spawnPosition = Idx2SpawnPosition(idx);
 
-        GameObject block = Instantiate(blockPrefab, spawnPosition, Quaternion.identity);
-        block.GetComponent<Renderer>().material.color = new Color(Random.value, Random.value, Random.value);
+        GameObject block = Instantiate(blockPrefabs[type], spawnPosition, Quaternion.identity);
         block.transform.localScale = new Vector3(cubeSize, cubeSize, cubeSize);
     }
 
     public void DestroyBlock(int x, int y, int z)
     {
-        grid[x, y, z].occupied = false;
-        grid[x, y, z].blockType = -1;
+        //grid[x, y, z].occupied = false;
+        //grid[x, y, z].blockType = -1;
         // Destroy(...)
     }
 
@@ -155,17 +172,5 @@ public class GridManager : MonoBehaviour
         GameObject block = Instantiate(wireframeBlockPrefab, spawnPosition, Quaternion.identity);
         block.transform.localScale = new Vector3(cubeSize, cubeSize, cubeSize);
         return block;
-    }
-
-    public bool CanSnap(Vector3 position)
-    {
-        // check if it has at least one neighbour
-
-        // convert position to grid indices
-        Vector3Int idx = World2Idx(position);
-
-
-
-        return true;
     }
 }

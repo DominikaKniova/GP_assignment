@@ -5,8 +5,8 @@ using UnityEngine;
 public static class TerrainManager
 {
 
-    public static int waterLevel = 20;
-    public static int greeneryLevel = 50;
+    public static int waterLevel = 4;
+    public static int greeneryLevel = 20;
 
     private static int octavesCount = 3;
     private static float[] frequencies = {2, 4, 7};

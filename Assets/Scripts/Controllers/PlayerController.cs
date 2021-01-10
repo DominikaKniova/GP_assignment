@@ -15,19 +15,17 @@ public class PlayerController : MonoBehaviour
     public bool isGrounded;
     private bool doJump;
 
+    public int currentBlockType = 1;
+
     private Vector3 centerScreenPoint;
 
     private GameObject lastWireframeBlock;
-
-    // Start is called before the first frame update
     void Start()
     {
         playerRb = GetComponent<Rigidbody>();
         gridManager = GameObject.Find("Grid Manager").GetComponent<GridManager>();
         centerScreenPoint = new Vector3(Camera.main.pixelWidth / 2.0f, Camera.main.pixelHeight / 2.0f, 0);
     }
-
-    // Update is called once per frame
     void Update()
     {
         direction = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical")).normalized;
@@ -41,6 +39,8 @@ public class PlayerController : MonoBehaviour
             buildMode = !buildMode;
             Destroy(lastWireframeBlock);
         }
+
+        UpdateBlockType();
 
         if (buildMode)
         {
@@ -59,15 +59,29 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    private void UpdateBlockType()
+    {
+        if (Input.GetKeyDown(KeyCode.Alpha1))
+        {
+            currentBlockType = 0;
+        }
+        else if (Input.GetKeyDown(KeyCode.Alpha2))
+        {
+            currentBlockType = 1;
+        }
+        else if (Input.GetKeyDown(KeyCode.Alpha3))
+        {
+            currentBlockType = 2;
+        }
+        else if (Input.GetKeyDown(KeyCode.Alpha4))
+        {
+            currentBlockType = 3;
+        }
+    }
+
     void OnCollisionEnter(Collision collision)
     {
         isGrounded = true;
-        if (collision.gameObject.CompareTag("Ground"))
-        {
-            Debug.Log("OnCollisionEnter: " + collision.gameObject.name);
-
-        }
-        // but also set grounded to true if on top of a box
     }
 
     void FixedUpdate()
@@ -101,13 +115,7 @@ public class PlayerController : MonoBehaviour
             switch (hit.collider.tag)
             {
                 case "Block":
-                    Debug.Log("hit: " + hit.point);
                     wireframeBlock = gridManager.SnapWireframe(hit.transform.position + hit.normal);
-                    // get indices of intersecting block
-
-                    // get indices of a block before 
-
-                    // show wireframe
                     break;
 
                 case "Ground":
@@ -132,17 +140,11 @@ public class PlayerController : MonoBehaviour
             switch (hit.collider.tag)
             {
                 case "Block":
-                    gridManager.AddBlock(hit.transform.position + hit.normal, 1);
-
-                    // get indices of intersecting block
-
-                    // get indices of a block before 
-
-                    // show wireframe
+                    gridManager.AddBlock(hit.transform.position + hit.normal, currentBlockType);
                     break;
 
                 case "Ground":
-                    gridManager.AddBlock(hit.point, 1);
+                    gridManager.AddBlock(hit.point, currentBlockType);
                     break;
 
                 default:
@@ -150,7 +152,6 @@ public class PlayerController : MonoBehaviour
             }
         }
     }
-
     private void DestroyIntersectingBlock()
     {
         Ray ray = Camera.main.ScreenPointToRay(centerScreenPoint);

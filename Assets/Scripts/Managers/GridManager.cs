@@ -42,7 +42,7 @@ public class GridManager : MonoBehaviour
         cubeSize = range / xDim;
         step = cubeSize;
         center = cubeSize / 2;
-        TestSpawning();
+        RandomTerrain();
     }
 
     private void InitGrid()
@@ -71,6 +71,33 @@ public class GridManager : MonoBehaviour
         corners.Add(ground.transform.TransformPoint(groundVertices[120]));
         groundVertices.Clear();
         return corners;
+    }
+
+    private void RandomTerrain()
+    {
+        int[,] heightMap = TerrainManager.GenerateHeightMap(xDim, zDim, 20);
+
+        for (int z = 0; z < zDim; z++)
+        {
+            for (int x = 0; x < xDim; x++)
+            {
+                Vector3 spawnPosition = new Vector3(x * step + minX + center, heightMap[z,x] * step + center, z * step + minZ + center);
+                GameObject block = Instantiate(blockPrefab, spawnPosition, Quaternion.identity);
+                if (heightMap[z, x] <= TerrainManager.waterLevel)
+                {
+                    block.GetComponent<Renderer>().material.color = new Color(0, 0, 255);
+                }
+                else if (heightMap[z, x] <= TerrainManager.greeneryLevel)
+                {
+                    block.GetComponent<Renderer>().material.color = new Color(0, 255, 0);
+                }
+                else
+                {
+                    block.GetComponent<Renderer>().material.color = new Color(255, 255, 255);
+                }
+                block.transform.localScale = new Vector3(cubeSize, cubeSize, cubeSize);
+            }
+        }
     }
 
     private void TestSpawning()

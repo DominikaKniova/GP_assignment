@@ -9,7 +9,7 @@ public class CameraConstroller : MonoBehaviour
 
     private float yaw = 0.0f;
     private float pitch = 0.0f;
-    private float speed = 5.0f;
+    private float speed = 2.5f;
     private float rotationBound = 45.0f;
 
     private float horizontalInput;

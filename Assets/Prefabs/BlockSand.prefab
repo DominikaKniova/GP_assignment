@@ -12,9 +12,10 @@ GameObject:
   - component: {fileID: 2401502720613309110}
   - component: {fileID: 4846379515275771251}
   - component: {fileID: 5837150545799927298}
+  - component: {fileID: 9075959732795499681}
   m_Layer: 0
   m_Name: BlockSand
-  m_TagString: Untagged
+  m_TagString: Block
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -93,3 +94,16 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &9075959732795499681
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4559718959688575389}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5393a34441048f843ab7dda25243311a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  destroyTime: 3

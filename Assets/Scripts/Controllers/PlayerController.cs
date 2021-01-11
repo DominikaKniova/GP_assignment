@@ -20,6 +20,16 @@ public class PlayerController : MonoBehaviour
     private Vector3 centerScreenPoint;
 
     private GameObject lastWireframeBlock;
+
+    public float startTime;
+    public float destroyTime;
+    public bool isDestroying;
+    private GameObject destroyObject;
+
+    public GameObject progressBar;
+    public delegate void ProgressEventHandler(float progress);
+    public event ProgressEventHandler ProgressTo;
+
     void Start()
     {
         playerRb = GetComponent<Rigidbody>();
@@ -29,6 +39,7 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
         direction = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical")).normalized;
+
         if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
         {
             doJump = true;
@@ -45,20 +56,43 @@ public class PlayerController : MonoBehaviour
         if (buildMode)
         {
             Destroy(lastWireframeBlock);
-            lastWireframeBlock = ShowWireframeBlock();
 
-            if (Input.GetMouseButtonDown(0))
+            if (isDestroying && Input.GetMouseButton(1))
             {
-                CreateBlock();
+                progressBar.SetActive(true);
+                ProgressTo((Time.time - startTime) / destroyTime);
+                if (startTime + destroyTime <= Time.time)
+                {
+                    Destroy(destroyObject);
+                    isDestroying = false;
+                    progressBar.SetActive(false);
+                }
             }
 
-            if (Input.GetMouseButtonDown(1))
+            RaycastHit hit;
+            if (CastRay(out hit))
             {
-                DestroyIntersectingBlock();
+                lastWireframeBlock = ShowWireframeBlock(hit);
+
+                if (Input.GetMouseButtonDown(0))
+                {
+                    CreateBlock(hit);
+                }
+
+                if (Input.GetMouseButtonDown(1))
+                {
+                    isDestroying = false;
+                    DestroyBlock(hit);
+                }
+            }
+
+            if (Input.GetMouseButtonUp(1))
+            {
+                isDestroying = false;
+                destroyObject = null;
             }
         }
     }
-
     private void UpdateBlockType()
     {
         if (Input.GetKeyDown(KeyCode.Alpha1))
@@ -103,67 +137,56 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    private GameObject ShowWireframeBlock()
+    private bool CastRay(out RaycastHit hit)
     {
         Ray ray = Camera.main.ScreenPointToRay(centerScreenPoint);
-        RaycastHit hit;
-
+        return Physics.Raycast(ray, out hit);
+    }
+    private GameObject ShowWireframeBlock(RaycastHit hit)
+    {
         GameObject wireframeBlock = null;
 
-        if (Physics.Raycast(ray, out hit)) 
+        switch (hit.collider.tag)
         {
-            switch (hit.collider.tag)
-            {
-                case "Block":
-                    wireframeBlock = gridManager.SnapWireframe(hit.transform.position + hit.normal);
-                    break;
+            case "Block":
+                wireframeBlock = gridManager.SnapWireframe(hit.transform.position + hit.normal);
+                break;
 
-                case "Ground":
-                    wireframeBlock = gridManager.SnapWireframe(hit.point);
-                    break;
+            case "Ground":
+                wireframeBlock = gridManager.SnapWireframe(hit.point);
+                break;
 
-                default:
-                    break;
-            }
+            default:
+                break;
         }
 
         return wireframeBlock;
     }
 
-    private void CreateBlock()
+    private void CreateBlock(RaycastHit hit)
     {
-        Ray ray = Camera.main.ScreenPointToRay(centerScreenPoint);
-        RaycastHit hit;
-
-        if (Physics.Raycast(ray, out hit))
+        switch (hit.collider.tag)
         {
-            switch (hit.collider.tag)
-            {
-                case "Block":
-                    gridManager.AddBlock(hit.transform.position + hit.normal, currentBlockType);
-                    break;
+            case "Block":
+                gridManager.AddBlock(hit.transform.position + hit.normal, currentBlockType);
+                break;
 
-                case "Ground":
-                    gridManager.AddBlock(hit.point, currentBlockType);
-                    break;
+            case "Ground":
+                gridManager.AddBlock(hit.point, currentBlockType);
+                break;
 
-                default:
-                    break;
-            }
+            default:
+                break;
         }
-    }
-    private void DestroyIntersectingBlock()
+}
+    private void DestroyBlock(RaycastHit hit)
     {
-        Ray ray = Camera.main.ScreenPointToRay(centerScreenPoint);
-        RaycastHit hit;
-
-        if (Physics.Raycast(ray, out hit))
+        if (hit.collider.tag == "Block")
         {
-            if (hit.collider.tag == "Block")
-            {
-                hit.collider.GetComponent<MeshRenderer>().material.color = new Color(255, 0, 0);
-                Destroy(hit.collider.gameObject);
-            }
+            startTime = Time.time;
+            destroyTime = hit.collider.gameObject.GetComponent<BlockController>().destroyTime;
+            isDestroying = true;
+            destroyObject = hit.collider.gameObject;
         }
     }
 }

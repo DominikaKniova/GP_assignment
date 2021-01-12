@@ -4,26 +4,28 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-    private GridManager gridManager;
-    private Rigidbody playerRb;
 
-    private float playerSpeed = 3.0f;
-    private float jumpForce = 6.0f;
+    // movement variables
+    private Rigidbody playerRb;
     private Vector3 direction;
 
-    public bool buildMode = false;
-    public bool isGrounded;
+    private float playerSpeed = 3.0f;
+    private float jumpForce = 4.5f;
+
+    private bool isGrounded;
     private bool doJump;
 
-    public int currentBlockType = 1;
-
-    private Vector3 centerScreenPoint;
-
+    // build variables
+    private GridManager gridManager;
     private GameObject lastWireframeBlock;
+    private Vector3 centerScreenPoint;
+    private bool buildMode = false;
+    private int currentBlockType = 0;   
 
-    public float startTime;
-    public float destroyTime;
-    public bool isDestroying;
+    // block destroying variables
+    private float startTime;
+    private float destroyTime;
+    private bool isDestroying;
     private GameObject destroyObject;
 
     public GameObject progressBar;
@@ -120,12 +122,11 @@ public class PlayerController : MonoBehaviour
 
     void FixedUpdate()
     {
-        MovePlayer();       
+        MovePlayer();
     }
 
     void MovePlayer()
     {
-        // fuj
         playerRb.MovePosition(transform.position 
             + (transform.forward * direction.z + transform.right * direction.x).normalized * Time.fixedDeltaTime * playerSpeed);
 
@@ -136,7 +137,6 @@ public class PlayerController : MonoBehaviour
             playerRb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
         }
     }
-
     private bool CastRay(out RaycastHit hit)
     {
         Ray ray = Camera.main.ScreenPointToRay(centerScreenPoint);

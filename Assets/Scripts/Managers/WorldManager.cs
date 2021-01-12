@@ -2,13 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GridManager : MonoBehaviour
+public class WorldManager : MonoBehaviour
 {
     public GameObject[] blockPrefabs;
     public GameObject wireframeBlockPrefab;
     public GameObject ground;
-
-    private GridCell[,,] grid;
 
     private const int xDim = 100;
     private const int yDim = 100;
@@ -25,11 +23,8 @@ public class GridManager : MonoBehaviour
     private float step;
     private float range;
 
-
     void Awake()
     {
-        //InitGrid();
-
         List<Vector3> corners = GroundCorners();
         minX = -corners[0].x;
         maxX = corners[0].x;
@@ -45,23 +40,6 @@ public class GridManager : MonoBehaviour
 
         //RandomTerrain();
     }
-
-    private void InitGrid()
-    {
-        grid = new GridCell[xDim, yDim, zDim];
-
-        for (int i = 0; i < xDim; i++)
-        {
-            for (int j = 0; j < yDim; j++)
-            {
-                for (int k = 0; k < zDim; k++)
-                {
-                    grid[i, j, k] = new GridCell();
-                }
-            }
-        }
-    }
-
     private List<Vector3> GroundCorners()
     {
         List<Vector3> corners = new List<Vector3>(); ;
@@ -138,9 +116,6 @@ public class GridManager : MonoBehaviour
     {
         Vector3Int idx = World2Idx(position);
 
-        //grid[idx.x, idx.y, idx.z].occupied = true;
-        //grid[idx.x, idx.y, idx.z].blockType = type;
-
         Vector3 spawnPosition = Idx2SpawnPosition(idx);
 
         GameObject block = Instantiate(blockPrefabs[type], spawnPosition, Quaternion.identity);
@@ -149,8 +124,6 @@ public class GridManager : MonoBehaviour
 
     public void DestroyBlock(int x, int y, int z)
     {
-        //grid[x, y, z].occupied = false;
-        //grid[x, y, z].blockType = -1;
         // Destroy(...)
     }
 

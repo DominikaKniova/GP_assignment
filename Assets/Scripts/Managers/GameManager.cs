@@ -6,9 +6,9 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
-    public GameObject grid;
+    public GameObject world;
     public GameObject player;
-    private GridManager gridManager;
+    private WorldManager worldManager;
 
     Dictionary<string, int> types = new Dictionary<string, int> { 
         { "BlockGrass(Clone)", 0 }, 
@@ -50,18 +50,17 @@ public class GameManager : MonoBehaviour
             {
                 Destroy(block);
             }
-            Destroy(GameObject.Find("Player"));
 
             BinaryFormatter bf = new BinaryFormatter();
             FileStream file = File.Open(Application.persistentDataPath + "/" + saveFileName, FileMode.Open);
             SaveData data = (SaveData)bf.Deserialize(file);
             file.Close();
 
-            gridManager = grid.GetComponent<GridManager>();
+            worldManager = world.GetComponent<WorldManager>();
 
             for (int i = 0; i < data.blockPositions.Count; i++)
             {
-                gridManager.AddBlock(data.blockPositions[i].ToVector3(), data.blockTypes[i]);
+                worldManager.AddBlock(data.blockPositions[i].ToVector3(), data.blockTypes[i]);
             }
             player.transform.position = data.playerPosition.ToVector3();
         

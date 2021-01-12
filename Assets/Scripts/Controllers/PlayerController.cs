@@ -16,7 +16,7 @@ public class PlayerController : MonoBehaviour
     private bool doJump;
 
     // build variables
-    private GridManager gridManager;
+    private WorldManager gridManager;
     private GameObject lastWireframeBlock;
     private Vector3 centerScreenPoint;
     private bool buildMode = false;
@@ -35,7 +35,7 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
         playerRb = GetComponent<Rigidbody>();
-        gridManager = GameObject.Find("Grid Manager").GetComponent<GridManager>();
+        gridManager = GameObject.Find("World Manager").GetComponent<WorldManager>();
         centerScreenPoint = new Vector3(Camera.main.pixelWidth / 2.0f, Camera.main.pixelHeight / 2.0f, 0);
     }
     void Update()

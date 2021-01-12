@@ -237,7 +237,7 @@ GameObject:
   - component: {fileID: 262615682}
   - component: {fileID: 262615683}
   m_Layer: 0
-  m_Name: Grid Manager
+  m_Name: World Manager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -636,7 +636,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0067998b3d7cb3e43b4033c27065d9c5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  grid: {fileID: 262615681}
+  world: {fileID: 262615681}
   player: {fileID: 969832371}
 --- !u!4 &1277316267
 Transform:
@@ -1389,7 +1389,7 @@ PrefabInstance:
     - target: {fileID: 1769737810635233694, guid: eb74ff5e86ef2c34ab2384689db4f977,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.989
+      value: 50
       objectReference: {fileID: 0}
     - target: {fileID: 1769737810635233694, guid: eb74ff5e86ef2c34ab2384689db4f977,
         type: 3}

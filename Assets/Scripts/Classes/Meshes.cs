@@ -34,6 +34,8 @@ public static class Meshes
 		//	0, 1, 6
 		//};
 
+		public static string[] faceOrder = new string[] { "front", "top", "right", "left", "back", "bottom" };
+
 		public static Dictionary<string, List<Vector3>> vertices = new Dictionary<string, List<Vector3>>
 		{
 			{"front", new List<Vector3> { cubeVertices[0], cubeVertices[1], cubeVertices[2], cubeVertices[3] }},

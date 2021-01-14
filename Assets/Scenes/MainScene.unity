@@ -240,7 +240,7 @@ GameObject:
   - component: {fileID: 258462395}
   m_Layer: 0
   m_Name: Plane (3)
-  m_TagString: Untagged
+  m_TagString: WorldBorder
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -267,7 +267,7 @@ BoxCollider:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 258462393}
   m_Material: {fileID: 0}
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
   m_Size: {x: 10, y: 0.08, z: 10}
@@ -550,7 +550,7 @@ GameObject:
   - component: {fileID: 823622276}
   m_Layer: 0
   m_Name: Plane (1)
-  m_TagString: Untagged
+  m_TagString: WorldBorder
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -577,10 +577,10 @@ BoxCollider:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 823622274}
   m_Material: {fileID: 0}
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 10, y: 0.16, z: 10}
+  m_Size: {x: 10, y: 0.08, z: 10}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!23 &823622277
 MeshRenderer:
@@ -801,7 +801,7 @@ GameObject:
   - component: {fileID: 1275597961}
   m_Layer: 0
   m_Name: Plane
-  m_TagString: Untagged
+  m_TagString: WorldBorder
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -828,10 +828,10 @@ BoxCollider:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1275597959}
   m_Material: {fileID: 0}
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 10, y: 0.16, z: 10}
+  m_Size: {x: 10, y: 0.08, z: 10}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!23 &1275597962
 MeshRenderer:
@@ -1499,7 +1499,7 @@ GameObject:
   - component: {fileID: 1876548317}
   m_Layer: 0
   m_Name: Plane (2)
-  m_TagString: Untagged
+  m_TagString: WorldBorder
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1526,10 +1526,10 @@ BoxCollider:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1876548315}
   m_Material: {fileID: 0}
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 10, y: 0.16, z: 10}
+  m_Size: {x: 10, y: 0.08, z: 10}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!23 &1876548318
 MeshRenderer:
@@ -1800,7 +1800,7 @@ PrefabInstance:
     - target: {fileID: 7139667878687418653, guid: eb74ff5e86ef2c34ab2384689db4f977,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: -21.95
+      value: -13.49
       objectReference: {fileID: 0}
     - target: {fileID: 7139667878687418653, guid: eb74ff5e86ef2c34ab2384689db4f977,
         type: 3}

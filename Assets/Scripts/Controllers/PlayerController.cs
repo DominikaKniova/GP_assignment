@@ -123,20 +123,19 @@ public class PlayerController : MonoBehaviour
 
     void OnCollisionEnter(Collision collision)
     {
-       isGrounded = true;
+        isGrounded = true;
+        if (collision.gameObject.CompareTag("WorldBorder"))
+        {
+            Debug.Log("Generate new world");
+            canMove = false;
+            worldManager.ResetWorld();
+            int y = worldManager.GetHeightForPosition(transform.position);
+            transform.position += transform.position.y * Vector3.down + y * Vector3.up + Vector3.up * 2;
+            canMove = true;
+        }
+        
+       
     }
-
-    void OnTriggerEnter(Collider collider)
-    {
-        Debug.Log("Trigger: " + collider.gameObject.name);
-        Transform playerTransform = transform;
-        canMove = false;
-        worldManager.ResetWorld();
-        int y = worldManager.GetHeightForPosition(transform.position);
-        transform.position += transform.position.y * Vector3.down + y * Vector3.up + Vector3.up * 2;
-        canMove = true;
-    }
-
     void FixedUpdate()
     {
         if (canMove)

@@ -8,9 +8,11 @@ public class WorldManager : MonoBehaviour
     public GameObject wireframeBlockPrefab;
     public GameObject ground;
 
-    private const int xDim = 100;
-    private const int yDim = 100;
-    private const int zDim = 100;
+    private const int xDim = 50;
+    private const int yDim = 50;
+    private const int zDim = 50;
+
+    int[,] heightMap = new int[xDim, zDim];
 
     private float minX;
     private float maxX;
@@ -38,7 +40,7 @@ public class WorldManager : MonoBehaviour
         step = cubeSize;
         center = cubeSize / 2;
 
-        //RandomTerrain();
+        RandomTerrain();
     }
     private List<Vector3> GroundCorners()
     {
@@ -54,15 +56,15 @@ public class WorldManager : MonoBehaviour
 
     private void RandomTerrain()
     {
-        int[,] heightMap = TerrainManager.GenerateHeightMap(xDim, zDim, 10);
-        int minheight = 10000;
-        int maxheight = -1;
+        heightMap = TerrainManager.GenerateHeightMap(xDim, zDim, 10);
+        int blockCount = 0;
         for (int z = 0; z < zDim; z++)
         {
             for (int x = 0; x < xDim; x++)
             {
-                for (int y = heightMap[z, x] - 1; y < heightMap[z, x]; y++)
+                for (int y = 0; y < heightMap[z, x]; y++)
                 {
+                    blockCount++;
                     Vector3 spawnPosition = new Vector3(x * step + minX + center, y * step + minY + center, z * step + minZ + center);
                     GameObject block = Instantiate(blockPrefabs[0], spawnPosition, Quaternion.identity);
                     block.transform.localScale = new Vector3(cubeSize, cubeSize, cubeSize);
@@ -71,29 +73,14 @@ public class WorldManager : MonoBehaviour
                     {
                         block.GetComponent<Renderer>().material.color = new Color(0, 0, 255);
                     }
-                    else if (y <= TerrainManager.greeneryLevel)
-                    {
-                        //block.GetComponent<Renderer>().material.color = new Color(0, 255, 0);
-                        block.GetComponent<Renderer>().material.color = new Color(Random.value, Random.value, Random.value);
-                    }
-                    else
+                    else if (y > TerrainManager.greeneryLevel)
                     {
                         block.GetComponent<Renderer>().material.color = new Color(255, 255, 255);
                     }
                 }
-
-                if (heightMap[z, x] < minheight)
-                {
-                    minheight = heightMap[z, x];
-                }
-                if (heightMap[z, x] > maxheight)
-                {
-                    maxheight = heightMap[z, x];
-                }
             }
         }
-        Debug.Log("min " + minheight);
-        Debug.Log("max " + maxheight);
+        Debug.Log(blockCount);
     }
 
     private void TestSpawning()
@@ -145,5 +132,21 @@ public class WorldManager : MonoBehaviour
         GameObject block = Instantiate(wireframeBlockPrefab, spawnPosition, Quaternion.identity);
         block.transform.localScale = new Vector3(cubeSize, cubeSize, cubeSize);
         return block;
+    }
+
+    public void ResetWorld()
+    {
+        // empty scene
+        foreach (GameObject block in GameObject.FindGameObjectsWithTag("Block"))
+        {
+            Destroy(block);
+        }
+        RandomTerrain();
+    }
+
+    public int GetHeightForPosition(Vector3 position)
+    {
+        Vector3Int idx = World2Idx(position);
+        return heightMap[idx.z, idx.x];
     }
 }

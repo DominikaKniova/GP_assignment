@@ -12,11 +12,12 @@ public class PlayerController : MonoBehaviour
     private float playerSpeed = 3.0f;
     private float jumpForce = 4.5f;
 
-    private bool isGrounded;
+    public bool isGrounded;
     private bool doJump;
+    private bool canMove = true;
 
     // build variables
-    private WorldManager gridManager;
+    private WorldManager worldManager;
     private GameObject lastWireframeBlock;
     private Vector3 centerScreenPoint;
     private bool buildMode = false;
@@ -35,8 +36,12 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
         playerRb = GetComponent<Rigidbody>();
-        gridManager = GameObject.Find("World Manager").GetComponent<WorldManager>();
+        worldManager = GameObject.Find("World Manager").GetComponent<WorldManager>();
         centerScreenPoint = new Vector3(Camera.main.pixelWidth / 2.0f, Camera.main.pixelHeight / 2.0f, 0);
+
+        int y = worldManager.GetHeightForPosition(transform.position);
+        Debug.Log("height " + y);
+        transform.position += transform.position.y * Vector3.down + y * Vector3.up + Vector3.up * 2;
     }
     void Update()
     {
@@ -92,6 +97,7 @@ public class PlayerController : MonoBehaviour
             {
                 isDestroying = false;
                 destroyObject = null;
+                progressBar.SetActive(false);
             }
         }
     }
@@ -117,12 +123,24 @@ public class PlayerController : MonoBehaviour
 
     void OnCollisionEnter(Collision collision)
     {
-        isGrounded = true;
+       isGrounded = true;
+    }
+
+    void OnTriggerEnter(Collider collider)
+    {
+        Debug.Log("Trigger: " + collider.gameObject.name);
+        Transform playerTransform = transform;
+        canMove = false;
+        worldManager.ResetWorld();
+        int y = worldManager.GetHeightForPosition(transform.position);
+        transform.position += transform.position.y * Vector3.down + y * Vector3.up + Vector3.up * 2;
+        canMove = true;
     }
 
     void FixedUpdate()
     {
-        MovePlayer();
+        if (canMove)
+            MovePlayer();
     }
 
     void MovePlayer()
@@ -149,11 +167,11 @@ public class PlayerController : MonoBehaviour
         switch (hit.collider.tag)
         {
             case "Block":
-                wireframeBlock = gridManager.SnapWireframe(hit.transform.position + hit.normal);
+                wireframeBlock = worldManager.SnapWireframe(hit.transform.position + hit.normal);
                 break;
 
             case "Ground":
-                wireframeBlock = gridManager.SnapWireframe(hit.point);
+                wireframeBlock = worldManager.SnapWireframe(hit.point);
                 break;
 
             default:
@@ -168,11 +186,11 @@ public class PlayerController : MonoBehaviour
         switch (hit.collider.tag)
         {
             case "Block":
-                gridManager.AddBlock(hit.transform.position + hit.normal, currentBlockType);
+                worldManager.AddBlock(hit.transform.position + hit.normal, currentBlockType);
                 break;
 
             case "Ground":
-                gridManager.AddBlock(hit.point, currentBlockType);
+                worldManager.AddBlock(hit.point, currentBlockType);
                 break;
 
             default:

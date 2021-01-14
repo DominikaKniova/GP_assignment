@@ -9,7 +9,7 @@ public static class TerrainManager
     public static int greeneryLevel = 20;
 
     private static int octavesCount = 3;
-    private static float[] frequencies = {2, 4, 7};
+    private static float[] frequencies = {2, 4, 5};
     private static float[] elevations = {1, 0.5f, 0.75f};
     public static int[,] GenerateHeightMap(float width, float depth, float maxHeight)
     {

@@ -10,7 +10,7 @@ public class ChunkObject : MonoBehaviour
     public List<int> triangles = new List<int>();
     public List<Vector2> UVs = new List<Vector2>();
 
-    public const int chunkSize = 8;
+    public const int chunkSize = 16;
     public int[,,] chunkGrid = new int[chunkSize, chunkSize, chunkSize];
     private void Start()
     {
@@ -19,6 +19,7 @@ public class ChunkObject : MonoBehaviour
 
     public void CreateChunkObject()
     {
+        // generate chunk's geometry
         mesh = new Mesh();
         MeshFilter mf = GetComponent<MeshFilter>();
 
@@ -36,6 +37,21 @@ public class ChunkObject : MonoBehaviour
 
     private void FillWithBlocks()
     {
+        // randomly initialize blocks in chunk
+        for (int y = 0; y < chunkSize; y++)
+        {
+            for (int x = 0; x < chunkSize; x++)
+            {
+                for (int z = 0; z < chunkSize; z++)
+                {
+                    if (Random.Range(0, 2) == 1)
+                    {
+                        chunkGrid[x, y, z] = 1;
+                    }
+                }
+            }
+        }
+
         // create child blocks of this chunk
         for (int y = 0; y < chunkSize; y++)
         {
@@ -43,36 +59,29 @@ public class ChunkObject : MonoBehaviour
             {
                 for (int z = 0; z < chunkSize; z++)
                 {
-                    chunkGrid[x, y, z] = 1;
-                }
-            }
-        }
-
-        for (int y = 0; y < chunkSize; y++)
-        {
-            for (int x = 0; x < chunkSize; x++)
-            {
-                for (int z = 0; z < chunkSize; z++)
-                {
-                    BlockObject block = new BlockObject(this, new Vector3(x, y, z));
-                    block.CreateFilteredBlockMesh();
+                    if (chunkGrid[x, y, z] == 1)
+                    {
+                        BlockGeometry block = new BlockGeometry(this, new Vector3(x, y, z));
+                        block.CreateFilteredBlockMesh();
+                    }
                 }
             }
         }
     }
 
-    public bool NotBlockAt(Vector3 position)
+    public bool IsBlockAt(Vector3 position)
     {
         int x = (int) position.x;
         int y = (int) position.y;
         int z = (int) position.z;
 
+        // check whether there exists a block at the position
         if (x < 0 || x >= chunkSize ||
             y < 0 || y >= chunkSize ||
             z < 0 || z >= chunkSize)
         {
-            return true;
+            return false;
         }
-        return (chunkGrid[x, y, z] == 0);
+        return (chunkGrid[x, y, z] != 0);
     }
 }

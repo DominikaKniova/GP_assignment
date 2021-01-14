@@ -40,7 +40,7 @@ public class WorldManager : MonoBehaviour
         step = cubeSize;
         center = cubeSize / 2;
 
-        RandomTerrain();
+        //RandomTerrain();
     }
     private List<Vector3> GroundCorners()
     {

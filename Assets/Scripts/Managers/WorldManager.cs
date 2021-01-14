@@ -40,7 +40,7 @@ public class WorldManager : MonoBehaviour
         step = cubeSize;
         center = cubeSize / 2;
 
-        //RandomTerrain();
+        RandomTerrain();
     }
     private List<Vector3> GroundCorners()
     {
@@ -57,14 +57,12 @@ public class WorldManager : MonoBehaviour
     private void RandomTerrain()
     {
         heightMap = TerrainManager.GenerateHeightMap(xDim, zDim, 10);
-        int blockCount = 0;
         for (int z = 0; z < zDim; z++)
         {
             for (int x = 0; x < xDim; x++)
             {
                 for (int y = 0; y < heightMap[z, x]; y++)
                 {
-                    blockCount++;
                     Vector3 spawnPosition = new Vector3(x * step + minX + center, y * step + minY + center, z * step + minZ + center);
                     GameObject block = Instantiate(blockPrefabs[0], spawnPosition, Quaternion.identity);
                     block.transform.localScale = new Vector3(cubeSize, cubeSize, cubeSize);
@@ -80,7 +78,6 @@ public class WorldManager : MonoBehaviour
                 }
             }
         }
-        Debug.Log(blockCount);
     }
 
     private void TestSpawning()
@@ -141,7 +138,7 @@ public class WorldManager : MonoBehaviour
         {
             Destroy(block);
         }
-        //RandomTerrain();
+        RandomTerrain();
     }
 
     public int GetHeightForPosition(Vector3 position)

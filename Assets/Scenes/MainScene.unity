@@ -1777,6 +1777,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 927876650313143400, guid: eb74ff5e86ef2c34ab2384689db4f977,
+        type: 3}
+      propertyPath: progressBar
+      value: 
+      objectReference: {fileID: 1667710853}
     - target: {fileID: 2400301935535007810, guid: eb74ff5e86ef2c34ab2384689db4f977,
         type: 3}
       propertyPath: m_Name

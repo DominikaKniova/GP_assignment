@@ -23,14 +23,14 @@ public class ChunkObject
         chunkGameObj = MonoBehaviour.Instantiate(chunkPrefab, position, Quaternion.identity);
     }
 
-    public void CreateChunkObject()
+    public void CreateChunkObject(bool withInit = true)
     {
         // generate chunk's geometry
         mesh = new Mesh();
         MeshFilter mf = chunkGameObj.GetComponent<MeshFilter>();
         MeshCollider mc = chunkGameObj.GetComponent<MeshCollider>();
 
-        InitBlocksHeightMapBased();
+        if (withInit) InitBlocksHeightMapBased(); 
         FillChunkWithBlocks();
 
         mesh.vertices = vertices.ToArray();
@@ -56,17 +56,6 @@ public class ChunkObject
                         BlockGeometry block = new BlockGeometry(this, new Vector3(x, y, z));
                         block.CreateFilteredBlockMesh();
                     }
-                }
-    }
-
-    private void InitBlocks()
-    {
-        // randomly initialize blocks in chunk
-        for (int y = 0; y < chunkSize; y++)
-            for (int x = 0; x < chunkSize; x++)
-                for (int z = 0; z < chunkSize; z++)
-                { 
-                    chunkGrid[x, y, z] = 1;
                 }
     }
 
@@ -101,4 +90,23 @@ public class ChunkObject
         }
         return (chunkGrid[x, y, z] != 0);
     }
+
+    public void AddBlock(Vector3 position)
+    {
+        if (chunkGrid[(int)position.x, (int)position.y, (int)position.z] == 1) Debug.Log("there is something already");
+        chunkGrid[(int)position.x, (int)position.y, (int)position.z] = 1;
+        ReCreateChunkObject();
+    }
+
+    private void ReCreateChunkObject()
+    {
+        //GameObject.DestroyImmediate(chunkGameObj.GetComponent<MeshCollider>());
+        //GameObject.DestroyImmediate(chunkGameObj.GetComponent<MeshRenderer>());
+        //GameObject.DestroyImmediate(chunkGameObj.GetComponent<MeshFilter>());
+        vertices.Clear();
+        triangles.Clear();
+        UVs.Clear();
+        CreateChunkObject(false);
+    }
+
 }

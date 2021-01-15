@@ -17,7 +17,8 @@ public class PlayerController : MonoBehaviour
     private bool canMove = true;
 
     // build variables
-    private WorldManager worldManager;
+    public WorldManager worldManager;
+    public ChunkedWorldManager chunkedWorldManager;
     private GameObject lastWireframeBlock;
     private Vector3 centerScreenPoint;
     private bool buildMode = false;
@@ -36,11 +37,9 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
         playerRb = GetComponent<Rigidbody>();
-        worldManager = GameObject.Find("World Manager").GetComponent<WorldManager>();
         centerScreenPoint = new Vector3(Camera.main.pixelWidth / 2.0f, Camera.main.pixelHeight / 2.0f, 0);
 
         int y = worldManager.GetHeightForPosition(transform.position);
-        Debug.Log("height " + y);
         transform.position += transform.position.y * Vector3.down + y * Vector3.up + Vector3.up * 2;
     }
     void Update()
@@ -124,17 +123,15 @@ public class PlayerController : MonoBehaviour
     void OnCollisionEnter(Collision collision)
     {
         isGrounded = true;
-        if (collision.gameObject.CompareTag("WorldBorder"))
-        {
-            Debug.Log("Generate new world");
-            canMove = false;
-            worldManager.ResetWorld();
-            int y = worldManager.GetHeightForPosition(transform.position);
-            transform.position += transform.position.y * Vector3.down + y * Vector3.up + Vector3.up * 2;
-            canMove = true;
-        }
-        
-       
+        //if (collision.gameObject.CompareTag("WorldBorder"))
+        //{
+        //    Debug.Log("Generate new world");
+        //    canMove = false;
+        //    worldManager.ResetWorld();
+        //    int y = worldManager.GetHeightForPosition(transform.position);
+        //    transform.position += transform.position.y * Vector3.down + y * Vector3.up + Vector3.up * 2;
+        //    canMove = true;
+        //}
     }
     void FixedUpdate()
     {
@@ -192,6 +189,9 @@ public class PlayerController : MonoBehaviour
                 worldManager.AddBlock(hit.point, currentBlockType);
                 break;
 
+            case "Chunk":
+                chunkedWorldManager.AddBlock(hit);
+                break;
             default:
                 break;
         }

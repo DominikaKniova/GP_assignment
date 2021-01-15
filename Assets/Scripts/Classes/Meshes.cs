@@ -56,12 +56,102 @@ public static class Meshes
 			{"bottom", new List<int> { 0, 6, 7, 0, 1, 6 }},
 		};
 
-        public static List<Vector2> UVs = new List<Vector2>
+		public static Dictionary<string, Vector2> atlasCoords = new Dictionary<string, Vector2>
+		{
+			{"grass", new Vector2 (0, 1)},
+			{"rock", new Vector2 (1, 1)},
+			{"dirt", new Vector2 (0, 0)},
+			{"sand", new Vector2 (1, 0)},
+			{"snow", new Vector2 (2, 1)},
+			{"water", new Vector2 (2, 0)},
+		};
+
+		public static float atlasOffU = 1.0f / 3.0f;
+		public static float atlasOffV = 1.0f / 2.0f;
+
+		public static List<Vector2> UVs = new List<Vector2>
         {
             new Vector2 (0, 0),
             new Vector2 (1, 0),
             new Vector2 (1, 1),
             new Vector2 (0, 1),
         };
+
+		public static Dictionary<string, List<Vector2>> atlasUVs = new Dictionary<string, List<Vector2>>
+		{
+			{"grass", new List<Vector2>
+				{
+				new Vector2 (atlasCoords["grass"].x * atlasOffU, atlasCoords["grass"].y * atlasOffV),
+				new Vector2 ((atlasCoords["grass"].x + 1) * atlasOffU, atlasCoords["grass"].y * atlasOffV),
+				new Vector2 ((atlasCoords["grass"].x + 1) * atlasOffU, (atlasCoords["grass"].y + 1) * atlasOffV),
+				new Vector2 (atlasCoords["grass"].x * atlasOffU, (atlasCoords["grass"].y + 1) * atlasOffV),
+				}
+			},
+
+			{"rock", new List<Vector2>
+				{
+				new Vector2 (atlasCoords["rock"].x * atlasOffU, atlasCoords["rock"].y * atlasOffV),
+				new Vector2 ((atlasCoords["rock"].x + 1) * atlasOffU, atlasCoords["rock"].y * atlasOffV),
+				new Vector2 ((atlasCoords["rock"].x + 1) * atlasOffU, (atlasCoords["rock"].y + 1) * atlasOffV),
+				new Vector2 (atlasCoords["rock"].x * atlasOffU, (atlasCoords["rock"].y + 1) * atlasOffV),
+				}
+			},
+
+			{"dirt", new List<Vector2>
+				{
+				new Vector2 (atlasCoords["dirt"].x * atlasOffU, atlasCoords["dirt"].y * atlasOffV),
+				new Vector2 ((atlasCoords["dirt"].x + 1) * atlasOffU, atlasCoords["dirt"].y * atlasOffV),
+				new Vector2 ((atlasCoords["dirt"].x + 1) * atlasOffU, (atlasCoords["dirt"].y + 1) * atlasOffV),
+				new Vector2 (atlasCoords["dirt"].x * atlasOffU, (atlasCoords["dirt"].y + 1) * atlasOffV),
+				}
+			},
+
+			{"sand", new List<Vector2>
+				{
+				new Vector2 (atlasCoords["sand"].x * atlasOffU, atlasCoords["sand"].y * atlasOffV),
+				new Vector2 ((atlasCoords["sand"].x + 1) * atlasOffU, atlasCoords["sand"].y * atlasOffV),
+				new Vector2 ((atlasCoords["sand"].x + 1) * atlasOffU, (atlasCoords["sand"].y + 1) * atlasOffV),
+				new Vector2 (atlasCoords["sand"].x * atlasOffU, (atlasCoords["sand"].y + 1) * atlasOffV),
+				}
+			},
+
+			{"water", new List<Vector2>
+				{
+				new Vector2 (atlasCoords["water"].x * atlasOffU, atlasCoords["water"].y * atlasOffV),
+				new Vector2 ((atlasCoords["water"].x + 1) * atlasOffU, atlasCoords["water"].y * atlasOffV),
+				new Vector2 ((atlasCoords["water"].x + 1) * atlasOffU, (atlasCoords["water"].y + 1) * atlasOffV),
+				new Vector2 (atlasCoords["water"].x * atlasOffU, (atlasCoords["water"].y + 1) * atlasOffV),
+				}
+			},
+
+			{"snow", new List<Vector2>
+				{
+				new Vector2 (atlasCoords["snow"].x * atlasOffU, atlasCoords["snow"].y * atlasOffV),
+				new Vector2 ((atlasCoords["snow"].x + 1) * atlasOffU, atlasCoords["snow"].y * atlasOffV),
+				new Vector2 ((atlasCoords["snow"].x + 1) * atlasOffU, (atlasCoords["snow"].y + 1) * atlasOffV),
+				new Vector2 (atlasCoords["snow"].x * atlasOffU, (atlasCoords["snow"].y + 1) * atlasOffV),
+				}
+			},
+		};
+
+		public static List<Vector2> atlasUV(string blockType)
+        {
+			Vector2 coords = atlasCoords[blockType];
+
+			float startU = coords.x * atlasOffU;
+			float startV = coords.y * atlasOffV;
+			float endU = (coords.x + 1) * atlasOffU;
+			float endV = (coords.y + 1) * atlasOffV;
+
+			List<Vector2> tex = new List<Vector2>
+			{
+				new Vector2 (startU, startV),
+				new Vector2 (endU, startV),
+				new Vector2 (endU, endV),
+				new Vector2 (startU, endV),
+			};
+
+			return tex;
+		}
 	}
 }

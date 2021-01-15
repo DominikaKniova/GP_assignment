@@ -6,10 +6,12 @@ public class BlockGeometry
 {
     public ChunkObject parent;
     public Vector3 position;
+    public string blockType;
     public BlockGeometry(ChunkObject parent, Vector3 position)
     {
         this.parent = parent;
         this.position = position;
+        this.blockType = "dirt";
     }
     private void BlockSide(string side)
     {
@@ -24,8 +26,8 @@ public class BlockGeometry
             parent.vertices.Add(Meshes.Cube.vertices[side][i] + position);
         }
 
-        // texture coords
-        parent.UVs.AddRange(Meshes.Cube.UVs);
+        // texture coords based on blockType
+        parent.UVs.AddRange(Meshes.Cube.atlasUVs[blockType]);
     }
     public void CreateBlockMesh()
     {

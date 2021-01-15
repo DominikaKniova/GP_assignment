@@ -16,6 +16,8 @@ public class ChunkObject
     public Vector3 position;
     private GameObject chunkGameObj;
 
+    public static string[] blockTypes = new string[7] { "empty", "grass", "rock", "dirt", "sand", "snow", "water"};
+
     public ChunkObject(Vector3 position, GameObject chunkPrefab)
     {
         this.position = position;
@@ -51,9 +53,9 @@ public class ChunkObject
             for (int x = 0; x < chunkSize; x++)
                 for (int z = 0; z < chunkSize; z++) 
                 { 
-                    if (chunkGrid[x, y, z] == 1)
+                    if (chunkGrid[x, y, z] != 0)
                     {
-                        BlockGeometry block = new BlockGeometry(this, new Vector3(x, y, z));
+                        BlockGeometry block = new BlockGeometry(this, new Vector3(x, y, z), blockTypes[chunkGrid[x, y, z]]);
                         block.CreateFilteredBlockMesh();
                     }
                 }
@@ -69,7 +71,9 @@ public class ChunkObject
                 {
                     for (int y = 0; y < Mathf.Min(chunkSize, height); y++)
                     {
-                        chunkGrid[x, y, z] = 1;
+                        if (position.y + y < 10) chunkGrid[x, y, z] = 6;
+                        else if (position.y + y > 20) chunkGrid[x, y, z] = 5;
+                        else chunkGrid[x, y, z] = 1;
                     }
                 }
             }

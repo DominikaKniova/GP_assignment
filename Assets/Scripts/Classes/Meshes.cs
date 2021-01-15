@@ -77,6 +77,7 @@ public static class Meshes
             new Vector2 (0, 1),
         };
 
+		// texture UV coordinates precomputed for every block type
 		public static Dictionary<string, List<Vector2>> atlasUVs = new Dictionary<string, List<Vector2>>
 		{
 			{"grass", new List<Vector2>

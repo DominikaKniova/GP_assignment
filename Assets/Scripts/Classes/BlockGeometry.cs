@@ -7,11 +7,11 @@ public class BlockGeometry
     public ChunkObject parent;
     public Vector3 position;
     public string blockType;
-    public BlockGeometry(ChunkObject parent, Vector3 position)
+    public BlockGeometry(ChunkObject parent, Vector3 position, string blockType)
     {
         this.parent = parent;
         this.position = position;
-        this.blockType = "dirt";
+        this.blockType = blockType;
     }
     private void BlockSide(string side)
     {

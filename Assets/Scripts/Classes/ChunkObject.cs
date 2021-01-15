@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ChunkObject : MonoBehaviour
+public class ChunkObject
 {
     private Mesh mesh;
 
@@ -10,22 +10,27 @@ public class ChunkObject : MonoBehaviour
     public List<int> triangles = new List<int>();
     public List<Vector2> UVs = new List<Vector2>();
 
-    public const int chunkSize = 16;
-    public int[,,] chunkGrid = new int[chunkSize, chunkSize, chunkSize];
-    private void Start()
+    private const int chunkSize = ChunkedWorldManager.chunkSize;
+    private int[,,] chunkGrid = new int[chunkSize, chunkSize, chunkSize];
+
+    public Vector3 position;
+    private GameObject chunkGameObj;
+
+    public ChunkObject(Vector3 position, GameObject chunkPrefab)
     {
-        CreateChunkObject();    
+        this.position = position;
+        chunkGameObj = MonoBehaviour.Instantiate(chunkPrefab, position, Quaternion.identity);
     }
 
     public void CreateChunkObject()
     {
         // generate chunk's geometry
         mesh = new Mesh();
-        MeshFilter mf = GetComponent<MeshFilter>();
-        MeshCollider mc = GetComponent<MeshCollider>();
+        MeshFilter mf = chunkGameObj.GetComponent<MeshFilter>();
+        MeshCollider mc = chunkGameObj.GetComponent<MeshCollider>();
 
-        InitializeBlocksPerlin();
-        FillWithBlocks();
+        InitBlocks();
+        FillChunkWithBlocks();
 
         mesh.vertices = vertices.ToArray();
         mesh.triangles = triangles.ToArray();
@@ -38,7 +43,7 @@ public class ChunkObject : MonoBehaviour
         mc.sharedMesh = mesh;
     }
 
-    private void FillWithBlocks()
+    private void FillChunkWithBlocks()
     {
         // create child blocks of this chunk
         for (int y = 0; y < chunkSize; y++)
@@ -57,7 +62,7 @@ public class ChunkObject : MonoBehaviour
         }
     }
 
-    private void InitializeBlocks()
+    private void InitBlocks()
     {
         // randomly initialize blocks in chunk
         for (int y = 0; y < chunkSize; y++)
@@ -66,16 +71,16 @@ public class ChunkObject : MonoBehaviour
             {
                 for (int z = 0; z < chunkSize; z++)
                 {
-                    if (Random.Range(0, 2) == 1)
-                    {
+                    //if (Random.Range(0, 2) == 1)
+                    //{
                         chunkGrid[x, y, z] = 1;
-                    }
+                    //}
                 }
             }
         }
     }
 
-    private void InitializeBlocksPerlin()
+    private void InitBlocksPerlin()
     {
         int[,] heightMap = TerrainManager.GenerateHeightMap(chunkSize, chunkSize, 5);
 

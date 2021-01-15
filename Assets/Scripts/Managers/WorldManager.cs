@@ -8,11 +8,9 @@ public class WorldManager : MonoBehaviour
     public GameObject wireframeBlockPrefab;
     public GameObject ground;
 
-    private const int xDim = 50;
-    private const int yDim = 50;
-    private const int zDim = 50;
+    public const int worldSize = 16 * 3;
 
-    int[,] heightMap = new int[xDim, zDim];
+    int[,] heightMap = new int[worldSize, worldSize];
 
     private float minX;
     private float maxX;
@@ -36,7 +34,7 @@ public class WorldManager : MonoBehaviour
         maxZ = corners[0].z;
 
         range = maxX - minX;
-        cubeSize = range / xDim;
+        cubeSize = range / worldSize;
         step = cubeSize;
         center = cubeSize / 2;
 
@@ -56,10 +54,10 @@ public class WorldManager : MonoBehaviour
 
     private void RandomTerrain()
     {
-        heightMap = TerrainManager.GenerateHeightMap(xDim, zDim, 10);
-        for (int z = 0; z < zDim; z++)
+        heightMap = TerrainManager.GenerateHeightMap(worldSize, worldSize, 10);
+        for (int z = 0; z < worldSize; z++)
         {
-            for (int x = 0; x < xDim; x++)
+            for (int x = 0; x < worldSize; x++)
             {
                 for (int y = 0; y < heightMap[z, x]; y++)
                 {
@@ -84,9 +82,9 @@ public class WorldManager : MonoBehaviour
     {
         for (int i = 0; i < 1; i+=2)
         {
-            for (int j = 0; j < zDim; j+=2)
+            for (int j = 0; j < worldSize; j+=2)
             {
-                for (int k = 0; k < xDim; k+=2)
+                for (int k = 0; k < worldSize; k+=2)
                 {
                     Vector3 spawnPosition = new Vector3(k * step + minX + center, i * step + center, j * step + minZ + center);
                     GameObject block = Instantiate(blockPrefabs[0], spawnPosition, Quaternion.identity);

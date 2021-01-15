@@ -4,19 +4,24 @@ using UnityEngine;
 
 public class ChunkedWorldManager : MonoBehaviour
 {
-    public const int chunkSize = 8;
+    public const int chunkSize = 16;
     public const int numChunk = 3;
     public const int worldSize = chunkSize * numChunk;
 
     public GameObject chunkPrefab;
 
     private ChunkObject[,,] chunks = new ChunkObject[numChunk, numChunk, numChunk];
-    private int[,] heightMap = new int[worldSize, worldSize];
+    public static int[,] heightMap = new int[worldSize, worldSize];
     
 
     void Awake()
     {
+        // initialize world
         InitChunks();
+
+        // generate random terrain
+        heightMap = TerrainManager.GenerateHeightMap(worldSize, worldSize, 4);
+
         FillWorldWithChunks();
     }
 

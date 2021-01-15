@@ -19,6 +19,7 @@ public class ChunkObject
     public ChunkObject(Vector3 position, GameObject chunkPrefab)
     {
         this.position = position;
+        // create chunk game object
         chunkGameObj = MonoBehaviour.Instantiate(chunkPrefab, position, Quaternion.identity);
     }
 
@@ -29,7 +30,7 @@ public class ChunkObject
         MeshFilter mf = chunkGameObj.GetComponent<MeshFilter>();
         MeshCollider mc = chunkGameObj.GetComponent<MeshCollider>();
 
-        InitBlocks();
+        InitBlocksHeightMapBased();
         FillChunkWithBlocks();
 
         mesh.vertices = vertices.ToArray();
@@ -47,53 +48,42 @@ public class ChunkObject
     {
         // create child blocks of this chunk
         for (int y = 0; y < chunkSize; y++)
-        {
             for (int x = 0; x < chunkSize; x++)
-            {
-                for (int z = 0; z < chunkSize; z++)
-                {
+                for (int z = 0; z < chunkSize; z++) 
+                { 
                     if (chunkGrid[x, y, z] == 1)
                     {
                         BlockGeometry block = new BlockGeometry(this, new Vector3(x, y, z));
                         block.CreateFilteredBlockMesh();
                     }
                 }
-            }
-        }
     }
 
     private void InitBlocks()
     {
         // randomly initialize blocks in chunk
         for (int y = 0; y < chunkSize; y++)
-        {
             for (int x = 0; x < chunkSize; x++)
-            {
                 for (int z = 0; z < chunkSize; z++)
-                {
-                    //if (Random.Range(0, 2) == 1)
-                    //{
-                        chunkGrid[x, y, z] = 1;
-                    //}
-                }
-            }
-        }
-    }
-
-    private void InitBlocksPerlin()
-    {
-        int[,] heightMap = TerrainManager.GenerateHeightMap(chunkSize, chunkSize, 5);
-
-        for (int x = 0; x < chunkSize; x++)
-        {
-            for (int z = 0; z < chunkSize; z++)
-            {
-                for (int y = 0; y < Mathf.Min(chunkSize, heightMap[x, z]); y++)
-                {
+                { 
                     chunkGrid[x, y, z] = 1;
                 }
+    }
+
+    private void InitBlocksHeightMapBased()
+    {
+        for (int x = 0; x < chunkSize; x++)
+            for (int z = 0; z < chunkSize; z++)
+            {
+                int height = ChunkedWorldManager.heightMap[x + (int)position.x, z + (int)position.z];
+                if (position.y < height)
+                {
+                    for (int y = 0; y < Mathf.Min(chunkSize, height); y++)
+                    {
+                        chunkGrid[x, y, z] = 1;
+                    }
+                }
             }
-        }
     }
 
     public bool IsBlockAt(Vector3 position)

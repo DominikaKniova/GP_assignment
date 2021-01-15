@@ -17,11 +17,13 @@ public class BlockGeometry
         // triangle vertex indices
         int vSize = parent.vertices.Count;
         parent.triangles.AddRange(new List<int> { vSize, vSize + 2, vSize + 1, vSize, vSize + 3, vSize + 2 });
+
         // face vertices
         for (int i = 0; i < 4; i++)
         {
             parent.vertices.Add(Meshes.Cube.vertices[side][i] + position);
         }
+
         // texture coords
         parent.UVs.AddRange(Meshes.Cube.UVs);
     }

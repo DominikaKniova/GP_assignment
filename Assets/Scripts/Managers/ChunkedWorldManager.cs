@@ -65,19 +65,20 @@ public class ChunkedWorldManager : MonoBehaviour
 
     public void DestroyBlock(RaycastHit hit)
     {
+        // chunk position and block position in local/chunk/block coords
+        Vector3Int chunkPosition = World2ChunkCoords(hit.transform.position);
+        Vector3Int blockPosition = World2BlockCoords(hit.point - hit.normal / 2.0f);
 
+        chunks[chunkPosition.x, chunkPosition.y, chunkPosition.z].DestroyBlock(blockPosition);
     }
 
     public void AddBlock(RaycastHit hit)
     {
-        // hit chunk position and spawn position of a new block in world coords
-        Vector3 chunkPositionWorld = hit.transform.position;
-        Vector3 blockPositionWorld = hit.point;
+        // chunk position and new block position in local/chunk/block coords
+        Vector3Int chunkPosition = World2ChunkCoords(hit.transform.position);
+        Vector3Int blockPosition = World2BlockCoords(hit.point);
 
-        // chunk position and spawn position in local/chunk/block coords
-        Vector3Int chunkPosition = World2ChunkCoords(chunkPositionWorld);
-        Vector3Int blockPosition = World2BlockCoords(blockPositionWorld);
-
+        // spawn position for a new block
         Vector3 spawnBlockPosition = blockPosition + hit.normal / 2.0f;
 
         // check whether spawn position is in current chunk or in neghbourhood one and adjust chunk and spawn position

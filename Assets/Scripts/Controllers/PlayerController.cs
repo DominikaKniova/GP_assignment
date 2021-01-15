@@ -205,5 +205,10 @@ public class PlayerController : MonoBehaviour
             isDestroying = true;
             destroyObject = hit.collider.gameObject;
         }
+
+        if (hit.collider.tag == "Chunk")
+        {
+            chunkedWorldManager.DestroyBlock(hit);
+        }
     }
 }

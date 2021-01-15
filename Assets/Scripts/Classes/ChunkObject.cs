@@ -91,18 +91,22 @@ public class ChunkObject
         return (chunkGrid[x, y, z] != 0);
     }
 
+    public void DestroyBlock(Vector3 position)
+    {
+        Debug.Log("destroying object " + position);
+        if (chunkGrid[(int)position.x, (int)position.y, (int)position.z] == 0) Debug.Log("already not there");
+        chunkGrid[(int)position.x, (int)position.y, (int)position.z] = 0;
+        ReCreateChunkObject();
+    }
+
     public void AddBlock(Vector3 position)
     {
-        if (chunkGrid[(int)position.x, (int)position.y, (int)position.z] == 1) Debug.Log("there is something already");
         chunkGrid[(int)position.x, (int)position.y, (int)position.z] = 1;
         ReCreateChunkObject();
     }
 
     private void ReCreateChunkObject()
     {
-        //GameObject.DestroyImmediate(chunkGameObj.GetComponent<MeshCollider>());
-        //GameObject.DestroyImmediate(chunkGameObj.GetComponent<MeshRenderer>());
-        //GameObject.DestroyImmediate(chunkGameObj.GetComponent<MeshFilter>());
         vertices.Clear();
         triangles.Clear();
         UVs.Clear();

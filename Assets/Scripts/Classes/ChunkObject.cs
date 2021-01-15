@@ -10,7 +10,7 @@ public class ChunkObject : MonoBehaviour
     public List<int> triangles = new List<int>();
     public List<Vector2> UVs = new List<Vector2>();
 
-    public const int chunkSize = 16;
+    public const int chunkSize = 10;
     public int[,,] chunkGrid = new int[chunkSize, chunkSize, chunkSize];
     private void Start()
     {
@@ -22,6 +22,7 @@ public class ChunkObject : MonoBehaviour
         // generate chunk's geometry
         mesh = new Mesh();
         MeshFilter mf = GetComponent<MeshFilter>();
+        MeshCollider mc = GetComponent<MeshCollider>();
 
         FillWithBlocks();
 
@@ -33,6 +34,7 @@ public class ChunkObject : MonoBehaviour
         mesh.RecalculateNormals();
 
         mf.mesh = mesh;
+        mc.sharedMesh = mesh;
     }
 
     private void FillWithBlocks()
@@ -62,7 +64,7 @@ public class ChunkObject : MonoBehaviour
                     if (chunkGrid[x, y, z] == 1)
                     {
                         BlockGeometry block = new BlockGeometry(this, new Vector3(x, y, z));
-                        block.CreateFilteredBlockMesh();
+                        block.CreateBlockMesh();
                     }
                 }
             }

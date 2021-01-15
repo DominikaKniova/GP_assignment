@@ -11,6 +11,7 @@ public static class TerrainManager
     private static int octavesCount = 3;
     private static float[] frequencies = {2, 4, 5};
     private static float[] elevations = {1, 0.5f, 0.75f};
+
     public static int[,] GenerateHeightMap(float width, float depth, float maxHeight)
     {
         int[,] heightMap = new int[(int)depth, (int)width];

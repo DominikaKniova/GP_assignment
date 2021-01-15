@@ -10,7 +10,7 @@ public class ChunkObject : MonoBehaviour
     public List<int> triangles = new List<int>();
     public List<Vector2> UVs = new List<Vector2>();
 
-    public const int chunkSize = 10;
+    public const int chunkSize = 16;
     public int[,,] chunkGrid = new int[chunkSize, chunkSize, chunkSize];
     private void Start()
     {
@@ -24,6 +24,7 @@ public class ChunkObject : MonoBehaviour
         MeshFilter mf = GetComponent<MeshFilter>();
         MeshCollider mc = GetComponent<MeshCollider>();
 
+        InitializeBlocksPerlin();
         FillWithBlocks();
 
         mesh.vertices = vertices.ToArray();
@@ -39,6 +40,25 @@ public class ChunkObject : MonoBehaviour
 
     private void FillWithBlocks()
     {
+        // create child blocks of this chunk
+        for (int y = 0; y < chunkSize; y++)
+        {
+            for (int x = 0; x < chunkSize; x++)
+            {
+                for (int z = 0; z < chunkSize; z++)
+                {
+                    if (chunkGrid[x, y, z] == 1)
+                    {
+                        BlockGeometry block = new BlockGeometry(this, new Vector3(x, y, z));
+                        block.CreateFilteredBlockMesh();
+                    }
+                }
+            }
+        }
+    }
+
+    private void InitializeBlocks()
+    {
         // randomly initialize blocks in chunk
         for (int y = 0; y < chunkSize; y++)
         {
@@ -53,19 +73,19 @@ public class ChunkObject : MonoBehaviour
                 }
             }
         }
+    }
 
-        // create child blocks of this chunk
-        for (int y = 0; y < chunkSize; y++)
+    private void InitializeBlocksPerlin()
+    {
+        int[,] heightMap = TerrainManager.GenerateHeightMap(chunkSize, chunkSize, 5);
+
+        for (int x = 0; x < chunkSize; x++)
         {
-            for (int x = 0; x < chunkSize; x++)
+            for (int z = 0; z < chunkSize; z++)
             {
-                for (int z = 0; z < chunkSize; z++)
+                for (int y = 0; y < Mathf.Min(chunkSize, heightMap[x, z]); y++)
                 {
-                    if (chunkGrid[x, y, z] == 1)
-                    {
-                        BlockGeometry block = new BlockGeometry(this, new Vector3(x, y, z));
-                        block.CreateBlockMesh();
-                    }
+                    chunkGrid[x, y, z] = 1;
                 }
             }
         }

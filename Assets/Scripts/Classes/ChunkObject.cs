@@ -63,24 +63,15 @@ public class ChunkObject
 
     private void InitBlocksHeightMapBased()
     {
-        int hmax = -1;
         for (int x = 0; x < chunkSize; x++)
             for (int z = 0; z < chunkSize; z++)
             {
                 int height = ChunkedWorldManager.heightMap[x + (int)position.x, z + (int)position.z];
-                if (hmax < height) hmax = height;
+
                 if (position.y <= height)
                 {
-                    int ymax;
-                    if (position.y + chunkSize <= height)
-                    {
-                        ymax = chunkSize;
-                    }
-                    else
-                    {
-                        ymax = height % chunkSize;
-                    }
-                    for (int y = 0; y < ymax; y++)
+                    height = position.y + chunkSize <= height ? chunkSize : height % chunkSize;
+                    for (int y = 0; y < height; y++)
                     {
                         if (position.y + y < 10) chunkGrid[x, y, z] = 6;
                         else if (position.y + y > 20) chunkGrid[x, y, z] = 5;
@@ -88,7 +79,6 @@ public class ChunkObject
                     }
                 }
             }
-        Debug.Log(hmax);
     }
 
     public bool IsBlockAt(Vector3 position)
@@ -121,17 +111,33 @@ public class ChunkObject
         ReCreateChunkObject();
     }
 
-    private void ReCreateChunkObject()
+    private void ClearBuffers()
     {
         vertices.Clear();
         triangles.Clear();
         UVs.Clear();
+    }
+    private void ReCreateChunkObject()
+    {
+        ClearBuffers();
         CreateChunkObject(false);
+    }
+
+    public void ClearChunk()
+    {
+        ClearBuffers();
+        for (int y = 0; y < chunkSize; y++)
+            for (int x = 0; x < chunkSize; x++)
+                for (int z = 0; z < chunkSize; z++)
+                {
+                    chunkGrid[x, y, z] = 0;
+                }
     }
 
     public int GetBlockType(Vector3 position)
     {
         return chunkGrid[(int)position.x, (int)position.y, (int)position.z];
     }
+
 
 }

@@ -166,4 +166,25 @@ public class ChunkedWorldManager : MonoBehaviour
         return heightMap[idx.x, idx.z];
     }
 
+    private void ClearChunks()
+    {
+        for (int y = 0; y < numChunk; y++)
+            for (int x = 0; x < numChunk; x++)
+                for (int z = 0; z < numChunk; z++)
+                {
+                    chunks[x, y, z].ClearChunk();
+                }
+    }
+    public void ReGenerateWorld()
+    {
+        // empty scene
+        ClearChunks();
+        Debug.Log("done clear");
+
+        // regenerate new height map for terrain
+        heightMap = TerrainManager.GenerateHeightMap(worldSize, worldSize, 10);
+
+        FillWorldWithChunks();
+    }
+
 }

@@ -51,6 +51,19 @@ public class PlayerController : MonoBehaviour
     {
         direction = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical")).normalized;
 
+        if (isOnWorldEdge())
+        {
+            canMove = false;
+            float worldCenter = ChunkedWorldManager.worldSize / 2.0f;
+            transform.position = worldCenter * (Vector3.right + Vector3.forward);
+            int height = chunkedWorldManager.GetHeightForPosition(transform.position);
+            transform.position += (height + 2) * Vector3.up;
+            Debug.Log("Generate new world");
+            chunkedWorldManager.ReGenerateWorld();
+            canMove = true;
+
+        }
+
         if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
         {
             doJump = true;
@@ -138,7 +151,7 @@ public class PlayerController : MonoBehaviour
             MovePlayer();
     }
 
-    void MovePlayer()
+    private void MovePlayer()
     {
         playerRb.MovePosition(transform.position 
             + (transform.forward * direction.z + transform.right * direction.x).normalized * Time.fixedDeltaTime * playerSpeed);
@@ -150,6 +163,19 @@ public class PlayerController : MonoBehaviour
             playerRb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
         }
     }
+
+    private bool isOnWorldEdge()
+    {
+        if (transform.position.x < 0 || transform.position.y < 0 || transform.position.z < 0
+            || transform.position.x > ChunkedWorldManager.worldSize || transform.position.y > ChunkedWorldManager.worldSize ||
+            transform.position.z > ChunkedWorldManager.worldSize)
+        {
+            Debug.Log("On edge");
+            return true;
+        }
+        return false;
+    }
+    
     private bool CastRay(out RaycastHit hit)
     {
         Ray ray = Camera.main.ScreenPointToRay(centerScreenPoint);

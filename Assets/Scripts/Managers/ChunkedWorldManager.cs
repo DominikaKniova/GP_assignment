@@ -133,4 +133,10 @@ public class ChunkedWorldManager : MonoBehaviour
         return false;
     }
 
+    public int GetHeightForPosition(Vector3 position)
+    {
+        Vector3Int idx = Vector3Int.FloorToInt(position);
+        return heightMap[idx.x, idx.z];
+    }
+
 }

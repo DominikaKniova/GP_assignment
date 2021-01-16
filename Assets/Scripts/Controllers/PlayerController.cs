@@ -39,7 +39,7 @@ public class PlayerController : MonoBehaviour
         playerRb = GetComponent<Rigidbody>();
         centerScreenPoint = new Vector3(Camera.main.pixelWidth / 2.0f, Camera.main.pixelHeight / 2.0f, 0);
 
-        int y = worldManager.GetHeightForPosition(transform.position);
+        int y = chunkedWorldManager.GetHeightForPosition(transform.position);
         transform.position += transform.position.y * Vector3.down + y * Vector3.up + Vector3.up * 2;
     }
     void Update()

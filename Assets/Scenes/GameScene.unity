@@ -911,6 +911,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   world: {fileID: 262615681}
   player: {fileID: 7847983718499804842}
+  chunkedWorldManager: {fileID: 1439463470}
 --- !u!4 &1277316267
 Transform:
   m_ObjectHideFlags: 0

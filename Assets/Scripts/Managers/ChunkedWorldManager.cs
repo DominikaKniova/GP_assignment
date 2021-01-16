@@ -10,7 +10,7 @@ public class ChunkedWorldManager : MonoBehaviour
 
     public GameObject chunkPrefab;
 
-    private ChunkObject[,,] chunks = new ChunkObject[numChunk, numChunk, numChunk];
+    public ChunkObject[,,] chunks = new ChunkObject[numChunk, numChunk, numChunk];
     public static int[,] heightMap = new int[worldSize, worldSize];
     void Awake()
     {

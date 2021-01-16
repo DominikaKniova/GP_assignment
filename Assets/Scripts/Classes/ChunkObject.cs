@@ -11,7 +11,7 @@ public class ChunkObject
     public List<Vector2> UVs = new List<Vector2>();
 
     private const int chunkSize = ChunkedWorldManager.chunkSize;
-    private int[,,] chunkGrid = new int[chunkSize, chunkSize, chunkSize];
+    public int[,,] chunkGrid = new int[chunkSize, chunkSize, chunkSize];
 
     public Vector3 position;
     private GameObject chunkGameObj;

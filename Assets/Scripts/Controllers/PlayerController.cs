@@ -41,8 +41,11 @@ public class PlayerController : MonoBehaviour
         playerRb = GetComponent<Rigidbody>();
         centerScreenPoint = new Vector3(Camera.main.pixelWidth / 2.0f, Camera.main.pixelHeight / 2.0f, 0);
 
-        int y = chunkedWorldManager.GetHeightForPosition(transform.position);
-        transform.position += transform.position.y * Vector3.down + y * Vector3.up + Vector3.up * 2;
+        // set init player position
+        float worldCenter = ChunkedWorldManager.worldSize / 2.0f;
+        int height = chunkedWorldManager.GetHeightForPosition(transform.position);
+        transform.position = Vector3.zero;
+        transform.position += (height+2) * Vector3.up + worldCenter * (Vector3.right + Vector3.forward);
     }
     void Update()
     {

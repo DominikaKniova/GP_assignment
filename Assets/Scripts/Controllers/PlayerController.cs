@@ -76,21 +76,25 @@ public class PlayerController : MonoBehaviour
                     progressBar.SetActive(false);
                 }
             }
-
-            RaycastHit hit;
-            if (CastRay(out hit))
+            else
             {
-                lastWireframeBlock = ShowWireframeBlock(hit);
-
-                if (Input.GetMouseButtonDown(0))
+                RaycastHit hit;
+                if (CastRay(out hit))
                 {
-                    CreateBlock(hit);
-                }
+                    lastWireframeBlock = ShowWireframeBlock(hit);
 
-                if (Input.GetMouseButtonDown(1))
-                {
-                    isDestroying = false;
-                    DestroyBlock(hit);
+                    if (Input.GetMouseButtonDown(0))
+                    {
+                        Destroy(lastWireframeBlock);
+                        CreateBlock(hit);
+                    }
+
+                    if (Input.GetMouseButtonDown(1))
+                    {
+                        Destroy(lastWireframeBlock);
+                        isDestroying = false;
+                        DestroyBlock(hit);
+                    }
                 }
             }
 
@@ -194,7 +198,7 @@ public class PlayerController : MonoBehaviour
                 break;
 
             case "Chunk":
-                chunkedWorldManager.AddBlock(hit);
+                chunkedWorldManager.AddBlock(hit, currentBlockType + 1);
                 break;
             default:
                 break;

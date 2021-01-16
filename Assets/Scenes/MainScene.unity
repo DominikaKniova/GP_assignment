@@ -1743,6 +1743,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Ground
       objectReference: {fileID: 0}
+    - target: {fileID: 1534432577697413467, guid: 677177375efa567498cc734b2299ca47,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1534432577697413470, guid: 677177375efa567498cc734b2299ca47,
         type: 3}
       propertyPath: m_RootOrder

@@ -8,7 +8,7 @@ public static class TerrainManager
     public static int greeneryLevel = 20;
 
     private static int octavesCount = 3;
-    private static float[] frequencies = {2, 4, 5};
+    private static float[] frequencies = {2, 5, 7};
     private static float[] elevations = {1, 0.5f, 0.75f};
 
     public static int[,] GenerateHeightMap(float width, float depth, float maxHeight)
@@ -26,7 +26,7 @@ public static class TerrainManager
                 {
                     value += elevations[i] * Mathf.PerlinNoise((frequencies[i] * y + rnd) / depth, (frequencies[i] * x + rnd) / width + rnd);
                 }
-                heightMap[(int)y, (int)x] = Mathf.RoundToInt(Mathf.Pow(value, 2.07f) * maxHeight);
+                heightMap[(int)y, (int)x] = Mathf.RoundToInt(Mathf.Pow(value, 2.8f) * maxHeight);
             }
         }
         return heightMap;

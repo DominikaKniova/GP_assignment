@@ -97,7 +97,7 @@ public class ChunkedWorldManager : MonoBehaviour
         chunks[chunkPosition.x, chunkPosition.y, chunkPosition.z].DestroyBlock(blockPosition);
     }
 
-    public void AddBlock(RaycastHit hit)
+    public void AddBlock(RaycastHit hit, int blockType)
     {
         // chunk position and new block position in local/chunk/block coords
         Vector3Int chunkPosition = World2ChunkCoords(hit.transform.position);
@@ -114,7 +114,7 @@ public class ChunkedWorldManager : MonoBehaviour
         }
 
         // add block to chunk
-        chunks[chunkPosition.x, chunkPosition.y, chunkPosition.z].AddBlock(spawnBlockPosition);
+        chunks[chunkPosition.x, chunkPosition.y, chunkPosition.z].AddBlock(spawnBlockPosition, blockType);
     }
 
     private bool isOutsideChunk(ref Vector3 blockPosition, ref Vector3Int chunkPosition)

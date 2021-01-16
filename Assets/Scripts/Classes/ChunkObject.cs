@@ -63,13 +63,24 @@ public class ChunkObject
 
     private void InitBlocksHeightMapBased()
     {
+        int hmax = -1;
         for (int x = 0; x < chunkSize; x++)
             for (int z = 0; z < chunkSize; z++)
             {
                 int height = ChunkedWorldManager.heightMap[x + (int)position.x, z + (int)position.z];
-                if (position.y < height)
+                if (hmax < height) hmax = height;
+                if (position.y <= height)
                 {
-                    for (int y = 0; y < Mathf.Min(chunkSize, height); y++)
+                    int ymax;
+                    if (position.y + chunkSize <= height)
+                    {
+                        ymax = chunkSize;
+                    }
+                    else
+                    {
+                        ymax = height % chunkSize;
+                    }
+                    for (int y = 0; y < ymax; y++)
                     {
                         if (position.y + y < 10) chunkGrid[x, y, z] = 6;
                         else if (position.y + y > 20) chunkGrid[x, y, z] = 5;
@@ -77,6 +88,7 @@ public class ChunkObject
                     }
                 }
             }
+        Debug.Log(hmax);
     }
 
     public bool IsBlockAt(Vector3 position)
@@ -103,9 +115,9 @@ public class ChunkObject
         ReCreateChunkObject();
     }
 
-    public void AddBlock(Vector3 position)
+    public void AddBlock(Vector3 position, int blockType)
     {
-        chunkGrid[(int)position.x, (int)position.y, (int)position.z] = 1;
+        chunkGrid[(int)position.x, (int)position.y, (int)position.z] = blockType;
         ReCreateChunkObject();
     }
 

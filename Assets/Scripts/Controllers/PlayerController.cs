@@ -17,12 +17,11 @@ public class PlayerController : MonoBehaviour
     private bool canMove = true;
 
     // build variables
-    public WorldManager worldManager;
     public ChunkedWorldManager chunkedWorldManager;
     private GameObject lastWireframeBlock;
     private Vector3 centerScreenPoint;
     private bool buildMode = false;
-    private int currentBlockType = 0;   
+    private int currentBlockType = 1;   
 
     // block destroying variables
     private float startTime;
@@ -33,7 +32,8 @@ public class PlayerController : MonoBehaviour
     public GameObject progressBar;
     public delegate void ProgressEventHandler(float progress);
     public event ProgressEventHandler ProgressTo;
-
+    
+    // wireframe block prefab
     public GameObject wireframeBlockPrefab;
 
     void Start()
@@ -43,9 +43,9 @@ public class PlayerController : MonoBehaviour
 
         // set init player position
         float worldCenter = ChunkedWorldManager.worldSize / 2.0f;
+        transform.position = worldCenter * (Vector3.right + Vector3.forward);
         int height = chunkedWorldManager.GetHeightForPosition(transform.position);
-        transform.position = Vector3.zero;
-        transform.position += (height+2) * Vector3.up + worldCenter * (Vector3.right + Vector3.forward);
+        transform.position += (height+2) * Vector3.up;
     }
     void Update()
     {
@@ -84,7 +84,7 @@ public class PlayerController : MonoBehaviour
                 RaycastHit hit;
                 if (CastRay(out hit))
                 {
-                    lastWireframeBlock = ShowWireframeBlock(hit);
+                    ShowWireframeBlock(hit);
 
                     if (Input.GetMouseButtonDown(0))
                     {
@@ -112,34 +112,25 @@ public class PlayerController : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Alpha1))
         {
-            currentBlockType = 0;
+            currentBlockType = 1;
         }
         else if (Input.GetKeyDown(KeyCode.Alpha2))
         {
-            currentBlockType = 1;
+            currentBlockType = 2;
         }
         else if (Input.GetKeyDown(KeyCode.Alpha3))
         {
-            currentBlockType = 2;
+            currentBlockType = 3;
         }
         else if (Input.GetKeyDown(KeyCode.Alpha4))
         {
-            currentBlockType = 3;
+            currentBlockType = 4;
         }
     }
 
     void OnCollisionEnter(Collision collision)
     {
         isGrounded = true;
-        //if (collision.gameObject.CompareTag("WorldBorder"))
-        //{
-        //    Debug.Log("Generate new world");
-        //    canMove = false;
-        //    worldManager.ResetWorld();
-        //    int y = worldManager.GetHeightForPosition(transform.position);
-        //    transform.position += transform.position.y * Vector3.down + y * Vector3.up + Vector3.up * 2;
-        //    canMove = true;
-        //}
     }
     void FixedUpdate()
     {
@@ -164,59 +155,24 @@ public class PlayerController : MonoBehaviour
         Ray ray = Camera.main.ScreenPointToRay(centerScreenPoint);
         return Physics.Raycast(ray, out hit);
     }
-    private GameObject ShowWireframeBlock(RaycastHit hit)
+    private void ShowWireframeBlock(RaycastHit hit)
     {
-        GameObject wireframeBlock = null;
-
-        switch (hit.collider.tag)
+        if (hit.collider.tag == "Chunk")
         {
-            case "Block":
-                wireframeBlock = worldManager.SnapWireframe(hit.transform.position + hit.normal);
-                break;
-
-            case "Ground":
-                wireframeBlock = worldManager.SnapWireframe(hit.point);
-                break;
-            case "Chunk":
-                Vector3 spawnPosition = chunkedWorldManager.GetWireframePosition(hit) + Vector3.one * 0.5f;
-                wireframeBlock = Instantiate(wireframeBlockPrefab, spawnPosition, Quaternion.identity);
-                break;
-            default:
-                break;
+            Vector3 spawnPosition = chunkedWorldManager.GetWireframePosition(hit) + Vector3.one * 0.5f;
+            lastWireframeBlock = Instantiate(wireframeBlockPrefab, spawnPosition, Quaternion.identity);
         }
-
-        return wireframeBlock;
     }
 
     private void CreateBlock(RaycastHit hit)
     {
-        switch (hit.collider.tag)
+        if (hit.collider.tag == "Chunk")
         {
-            case "Block":
-                worldManager.AddBlock(hit.transform.position + hit.normal, currentBlockType);
-                break;
-
-            case "Ground":
-                worldManager.AddBlock(hit.point, currentBlockType);
-                break;
-
-            case "Chunk":
-                chunkedWorldManager.AddBlock(hit, currentBlockType + 1);
-                break;
-            default:
-                break;
+            chunkedWorldManager.AddBlock(hit, currentBlockType);
         }
-}
+    }
     private void DestroyBlock(RaycastHit hit)
     {
-        if (hit.collider.tag == "Block")
-        {
-            startTime = Time.time;
-            destroyTime = hit.collider.gameObject.GetComponent<BlockController>().destroyTime;
-            isDestroying = true;
-            //destroyObject = hit.collider.gameObject;
-        }
-
         if (hit.collider.tag == "Chunk")
         {
             startTime = Time.time;

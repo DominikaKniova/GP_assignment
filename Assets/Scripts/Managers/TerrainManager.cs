@@ -4,7 +4,6 @@ using UnityEngine;
 
 public static class TerrainManager
 {
-
     public static int waterLevel = 4;
     public static int greeneryLevel = 20;
 

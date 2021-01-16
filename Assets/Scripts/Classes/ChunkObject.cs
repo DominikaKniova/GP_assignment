@@ -117,4 +117,9 @@ public class ChunkObject
         CreateChunkObject(false);
     }
 
+    public int GetBlockType(Vector3 position)
+    {
+        return chunkGrid[(int)position.x, (int)position.y, (int)position.z];
+    }
+
 }

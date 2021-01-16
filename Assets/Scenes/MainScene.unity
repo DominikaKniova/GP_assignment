@@ -1269,7 +1269,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   progressBar: {fileID: 1997304013}
-  player: {fileID: 0}
+  player: {fileID: 7847983718499804842}
 --- !u!1 &1773094324
 GameObject:
   m_ObjectHideFlags: 0

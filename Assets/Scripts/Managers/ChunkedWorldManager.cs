@@ -61,6 +61,14 @@ public class ChunkedWorldManager : MonoBehaviour
         return blockCoords;
     }
 
+    public int GetBlockType(RaycastHit hit)
+    {
+        // chunk position and block position in local/chunk/block coords
+        Vector3Int chunkPosition = World2ChunkCoords(hit.transform.position);
+        Vector3Int blockPosition = World2BlockCoords(hit.point);
+        return chunks[chunkPosition.x, chunkPosition.y, chunkPosition.z].GetBlockType(blockPosition);
+    }
+
     public void DestroyBlock(RaycastHit hit)
     {
         // chunk position and block position in local/chunk/block coords

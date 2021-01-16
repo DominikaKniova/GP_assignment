@@ -28,7 +28,7 @@ public class PlayerController : MonoBehaviour
     private float startTime;
     private float destroyTime;
     private bool isDestroying;
-    private GameObject destroyObject;
+    private RaycastHit destroyObjectHit;
 
     public GameObject progressBar;
     public delegate void ProgressEventHandler(float progress);
@@ -69,7 +69,7 @@ public class PlayerController : MonoBehaviour
                 ProgressTo((Time.time - startTime) / destroyTime);
                 if (startTime + destroyTime <= Time.time)
                 {
-                    Destroy(destroyObject);
+                    chunkedWorldManager.DestroyBlock(destroyObjectHit);
                     isDestroying = false;
                     progressBar.SetActive(false);
                 }
@@ -95,7 +95,7 @@ public class PlayerController : MonoBehaviour
             if (Input.GetMouseButtonUp(1))
             {
                 isDestroying = false;
-                destroyObject = null;
+                //destroyObject = null;
                 progressBar.SetActive(false);
             }
         }
@@ -203,12 +203,15 @@ public class PlayerController : MonoBehaviour
             startTime = Time.time;
             destroyTime = hit.collider.gameObject.GetComponent<BlockController>().destroyTime;
             isDestroying = true;
-            destroyObject = hit.collider.gameObject;
+            //destroyObject = hit.collider.gameObject;
         }
 
         if (hit.collider.tag == "Chunk")
         {
-            chunkedWorldManager.DestroyBlock(hit);
+            startTime = Time.time;
+            destroyTime = (float) chunkedWorldManager.GetBlockType(hit);
+            isDestroying = true;
+            destroyObjectHit = hit;
         }
     }
 }

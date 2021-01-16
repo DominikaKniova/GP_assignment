@@ -1837,6 +1837,12 @@ PrefabInstance:
       propertyPath: chunkedWorldManager
       value: 
       objectReference: {fileID: 1439463470}
+    - target: {fileID: 1672497581232099728, guid: eb74ff5e86ef2c34ab2384689db4f977,
+        type: 3}
+      propertyPath: wireframeBlockPrefab
+      value: 
+      objectReference: {fileID: 4753792605222422813, guid: 9723a06b7ba239442bbf04077fad1b5c,
+        type: 3}
     - target: {fileID: 3684213266384009656, guid: eb74ff5e86ef2c34ab2384689db4f977,
         type: 3}
       propertyPath: m_Name

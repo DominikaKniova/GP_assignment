@@ -34,6 +34,8 @@ public class PlayerController : MonoBehaviour
     public delegate void ProgressEventHandler(float progress);
     public event ProgressEventHandler ProgressTo;
 
+    public GameObject wireframeBlockPrefab;
+
     void Start()
     {
         playerRb = GetComponent<Rigidbody>();
@@ -95,7 +97,6 @@ public class PlayerController : MonoBehaviour
             if (Input.GetMouseButtonUp(1))
             {
                 isDestroying = false;
-                //destroyObject = null;
                 progressBar.SetActive(false);
             }
         }
@@ -169,7 +170,10 @@ public class PlayerController : MonoBehaviour
             case "Ground":
                 wireframeBlock = worldManager.SnapWireframe(hit.point);
                 break;
-
+            case "Chunk":
+                Vector3 spawnPosition = chunkedWorldManager.GetWireframePosition(hit) + Vector3.one * 0.5f;
+                wireframeBlock = Instantiate(wireframeBlockPrefab, spawnPosition, Quaternion.identity);
+                break;
             default:
                 break;
         }

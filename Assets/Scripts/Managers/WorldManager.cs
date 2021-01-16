@@ -122,8 +122,8 @@ public class WorldManager : MonoBehaviour
     public GameObject SnapWireframe(Vector3 position)
     {
         // convert position to grid indices
-        Vector3Int idx = World2Idx(position);
-        Vector3 spawnPosition = Idx2SpawnPosition(idx);
+        Vector3Int idx = Vector3Int.FloorToInt(new Vector3(position.x, Mathf.Max(position.y, 0.0f), position.z));
+        Vector3 spawnPosition = new Vector3(idx.x + center, idx.y + center, idx.z + center);
         GameObject block = Instantiate(wireframeBlockPrefab, spawnPosition, Quaternion.identity);
         block.transform.localScale = new Vector3(cubeSize, cubeSize, cubeSize);
         return block;

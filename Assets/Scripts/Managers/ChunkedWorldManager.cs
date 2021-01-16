@@ -69,6 +69,25 @@ public class ChunkedWorldManager : MonoBehaviour
         return chunks[chunkPosition.x, chunkPosition.y, chunkPosition.z].GetBlockType(blockPosition);
     }
 
+    public Vector3 GetWireframePosition(RaycastHit hit)
+    {
+        // chunk position and new block position in local/chunk/block coords
+        Vector3Int chunkPosition = World2ChunkCoords(hit.transform.position);
+        Vector3Int blockPosition = World2BlockCoords(hit.point);
+
+        // spawn position for a new block
+        Vector3 spawnBlockPosition = blockPosition + hit.normal / 2.0f;
+
+        // check whether spawn position is in current chunk or in neghbourhood one and adjust chunk and spawn position
+        if (isOutsideChunk(ref spawnBlockPosition, ref chunkPosition))
+        {
+            Debug.Log("Outside chunk");
+            // check whether a new chunk needs to be added TODO !!!
+        }
+
+        return new Vector3(chunkPosition.x * chunkSize + (int)spawnBlockPosition.x, chunkPosition.y * chunkSize + (int)spawnBlockPosition.y, chunkPosition.z * chunkSize + (int)spawnBlockPosition.z);
+    }
+
     public void DestroyBlock(RaycastHit hit)
     {
         // chunk position and block position in local/chunk/block coords

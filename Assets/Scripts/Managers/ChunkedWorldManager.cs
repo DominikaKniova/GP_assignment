@@ -185,13 +185,14 @@ public class ChunkedWorldManager : MonoBehaviour
     }
     public void ReGenerateWorld()
     {
-        // empty scene
+        // destroy current world
         ClearChunks();
         Debug.Log("done clear");
 
-        // regenerate new height map for terrain
+        // regenerate new height map for new terrain
         heightMap = TerrainManager.GenerateHeightMap(worldSize, worldSize, 10);
 
+        // build new world
         FillWorldWithChunks();
     }
 

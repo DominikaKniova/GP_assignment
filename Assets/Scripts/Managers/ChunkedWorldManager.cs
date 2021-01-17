@@ -175,6 +175,15 @@ public class ChunkedWorldManager : MonoBehaviour
                     chunks[x, y, z].ClearChunk();
                 }
     }
+
+    private void ClearHeightMap()
+    {
+        for (int x = 0; x < worldSize; x++)
+            for (int z = 0; z < worldSize; z++)
+            {
+                heightMap[x, z] = 0;
+            }
+    }
     public void ReGenerateWorld()
     {
         // empty scene
@@ -185,6 +194,12 @@ public class ChunkedWorldManager : MonoBehaviour
         heightMap = TerrainManager.GenerateHeightMap(worldSize, worldSize, 10);
 
         FillWorldWithChunks();
+    }
+
+    public void EmptyWorld()
+    {
+        // empty scene
+        ClearChunks();
     }
 
 }

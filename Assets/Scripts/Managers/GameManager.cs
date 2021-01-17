@@ -6,16 +6,9 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
-    public GameObject world;
     public GameObject player;
-    private WorldManager worldManager;
     public ChunkedWorldManager chunkedWorldManager;
 
-    Dictionary<string, int> types = new Dictionary<string, int> { 
-        { "BlockGrass(Clone)", 0 }, 
-        { "BlockStone(Clone)", 1 }, 
-        { "BlockDirt(Clone)", 2 }, 
-        { "BlockSand(Clone)", 3 } };
     private string saveFileName = "gamesave.save";
     
     public void SaveGame()
@@ -30,9 +23,9 @@ public class GameManager : MonoBehaviour
                     ChunkData chunkData = new ChunkData();
                     Vector3S position = new Vector3S(x, y, z);
 
-                    for (int j = 0; j < ChunkedWorldManager.numChunk; j++)
-                        for (int i = 0; i < ChunkedWorldManager.numChunk; i++)
-                            for (int k = 0; k < ChunkedWorldManager.numChunk; k++)
+                    for (int j = 0; j < ChunkedWorldManager.chunkSize; j++)
+                        for (int i = 0; i < ChunkedWorldManager.chunkSize; i++)
+                            for (int k = 0; k < ChunkedWorldManager.chunkSize; k++)
                             {
                                 int type = chunkedWorldManager.chunks[x, y, z].chunkGrid[i, j, k];
                                 if (type != 0)
@@ -46,42 +39,43 @@ public class GameManager : MonoBehaviour
                 }
 
         Vector3 playerPos = GameObject.Find("Player").transform.position;
-        save.playerPosition = new Vector3S(playerPos.x, playerPos.y, playerPos.z);
+        save.playerPosition = new Vector3S((int)playerPos.x, (int)playerPos.y, (int)playerPos.z);
+        save.heightMap = ChunkedWorldManager.heightMap;
 
-        //Debug.Log("Saving game to: " + Application.persistentDataPath);
+        Debug.Log("Saving game to: " + Application.persistentDataPath);
 
-        //BinaryFormatter bf = new BinaryFormatter();
-        //FileStream file = File.Create(Application.persistentDataPath + "/" + saveFileName);
-        //bf.Serialize(file, save);
-        //file.Close();
+        BinaryFormatter bf = new BinaryFormatter();
+        FileStream file = File.Create(Application.persistentDataPath + "/" + saveFileName);
+        bf.Serialize(file, save);
+        file.Close();
     }
 
     public void LoadGame()
     {
-        //if (File.Exists(Application.persistentDataPath + "/" + saveFileName))
-        //{
-        //    // empty scene
-        //    foreach (GameObject block in GameObject.FindGameObjectsWithTag("Block"))
-        //    {
-        //        Destroy(block);
-        //    }
+        if (File.Exists(Application.persistentDataPath + "/" + saveFileName))
+        {
+            chunkedWorldManager.EmptyWorld();
 
-        //    BinaryFormatter bf = new BinaryFormatter();
-        //    FileStream file = File.Open(Application.persistentDataPath + "/" + saveFileName, FileMode.Open);
-        //    SaveData data = (SaveData)bf.Deserialize(file);
-        //    file.Close();
+            BinaryFormatter bf = new BinaryFormatter();
+            FileStream file = File.Open(Application.persistentDataPath + "/" + saveFileName, FileMode.Open);
+            SaveData save = (SaveData)bf.Deserialize(file);
+            file.Close();
 
-        //    worldManager = world.GetComponent<WorldManager>();
+            ChunkedWorldManager.heightMap = save.heightMap;
 
-        //    for (int i = 0; i < data.blockPositions.Count; i++)
-        //    {
-        //        worldManager.AddBlock(data.blockPositions[i].ToVector3(), data.blockTypes[i]);
-        //    }
-        //    player.transform.position = data.playerPosition.ToVector3();
-        
-        //    Debug.Log("Loading successful");
-        //}
-        //else
-        //    Debug.LogError("Loading unsuccessful");
+            foreach (KeyValuePair<Vector3S, ChunkData> item in save.chunks)
+            {
+                Vector3S chunkPos = item.Key;
+                ChunkData chunkData = item.Value;
+
+                chunkedWorldManager.chunks[chunkPos.x, chunkPos.y, chunkPos.z].ReCreateChunkFromSave(ref chunkData);
+            }
+
+            player.transform.position = save.playerPosition.ToVector3();
+
+            Debug.Log("Loading successful");
+        }
+        else
+            Debug.LogError("Loading unsuccessful");
     }
 }

@@ -27,6 +27,7 @@ public struct Vector3S
     }
 }
 
+[System.Serializable]
 public class ChunkData
 {
     public List<Vector3S> blockPositions = new List<Vector3S>();
@@ -37,5 +38,6 @@ public class ChunkData
 public class SaveData
 {
     public Dictionary<Vector3S, ChunkData> chunks = new Dictionary<Vector3S, ChunkData>();
+    public int[,] heightMap = new int[ChunkedWorldManager.worldSize, ChunkedWorldManager.worldSize];
     public Vector3S playerPosition;
 }

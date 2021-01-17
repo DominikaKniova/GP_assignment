@@ -105,10 +105,10 @@ public class ChunkObject
         ReCreateChunkObject();
     }
 
-    public void AddBlock(Vector3 position, int blockType)
+    public void AddBlock(Vector3 position, int blockType, bool recreateChunk = true)
     {
         chunkGrid[(int)position.x, (int)position.y, (int)position.z] = blockType;
-        ReCreateChunkObject();
+        if (recreateChunk) ReCreateChunkObject();
     }
 
     private void ClearBuffers()
@@ -139,5 +139,12 @@ public class ChunkObject
         return chunkGrid[(int)position.x, (int)position.y, (int)position.z];
     }
 
-
+    public void ReCreateChunkFromSave(ref ChunkData chunkData)
+    {
+        for (int i = 0; i < chunkData.blockPositions.Count; i++)
+        {
+            chunkGrid[chunkData.blockPositions[i].x, chunkData.blockPositions[i].y, chunkData.blockPositions[i].z] = chunkData.blockTypes[i];
+        }
+        CreateChunkObject(false);
+    }
 }

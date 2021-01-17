@@ -547,6 +547,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   chunkPrefab: {fileID: 3201606472671475561, guid: 2527e868ebcf7eb46bcbb92dafa8cce1,
     type: 3}
+  wireframeBlockPrefab: {fileID: 4753792605222422813, guid: 9723a06b7ba239442bbf04077fad1b5c,
+    type: 3}
 --- !u!4 &1439463471
 Transform:
   m_ObjectHideFlags: 0

@@ -34,7 +34,7 @@ public class PlayerController : MonoBehaviour
     public event ProgressEventHandler ProgressTo;
     
     // wireframe block prefab
-    public GameObject wireframeBlockPrefab;
+
 
     void Start()
     {
@@ -194,8 +194,7 @@ public class PlayerController : MonoBehaviour
     {
         if (hit.collider.tag == "Chunk")
         {
-            Vector3 spawnPosition = chunkedWorldManager.GetWireframePosition(hit) + Vector3.one * 0.5f;
-            lastWireframeBlock = Instantiate(wireframeBlockPrefab, spawnPosition, Quaternion.identity);
+            lastWireframeBlock = chunkedWorldManager.SnapWireframeBlock(hit, transform.position);
         }
     }
 
@@ -203,12 +202,11 @@ public class PlayerController : MonoBehaviour
     {
         if (hit.collider.tag == "Chunk")
         {
-            chunkedWorldManager.AddBlock(hit, currentBlockType);
+            chunkedWorldManager.AddBlock(hit, currentBlockType, transform.position);
         }
     }
     private void DestroyBlock(RaycastHit hit)
     {
-        Debug.Log(hit.collider.name);
         if (hit.collider.tag == "Chunk")
         {
             startTime = Time.time;

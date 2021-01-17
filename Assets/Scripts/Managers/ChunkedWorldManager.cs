@@ -9,6 +9,7 @@ public class ChunkedWorldManager : MonoBehaviour
     public const int worldSize = chunkSize * numChunk;
 
     public GameObject chunkPrefab;
+    public GameObject wireframeBlockPrefab;
 
     public ChunkObject[,,] chunks = new ChunkObject[numChunk, numChunk, numChunk];
     public static int[,] heightMap = new int[worldSize, worldSize];
@@ -70,17 +71,25 @@ public class ChunkedWorldManager : MonoBehaviour
         return chunks[chunkPosition.x, chunkPosition.y, chunkPosition.z].GetBlockType(blockPosition);
     }
 
-    public Vector3 GetWireframePosition(RaycastHit hit)
+    public GameObject SnapWireframeBlock(RaycastHit hit, Vector3 playerPosition)
     {
         // position of a new block in world coords
-        Vector3 spawnPosition = hit.point + hit.normal / 2.0f;
+        Vector3 blockPositionWorld = hit.point + hit.normal / 2.0f;
 
         // get coords of a new block int block coords
-        Vector3Int blockPosition = World2BlockCoords(spawnPosition);
+        Vector3Int blockPosition = World2BlockCoords(blockPositionWorld);
         // get coords of the chunk where a new block will be spawned in chunk coords
-        Vector3Int chunkPosition = World2ChunkCoords(spawnPosition);
+        Vector3Int chunkPosition = World2ChunkCoords(blockPositionWorld);
 
-        return new Vector3(chunkPosition.x * chunkSize + blockPosition.x, chunkPosition.y * chunkSize + blockPosition.y, chunkPosition.z * chunkSize + blockPosition.z);
+        // show wireframe block (if player is not colliding with it)
+        if (!isCollidingWithPlayer(playerPosition, blockPosition, chunkPosition))
+        {
+            Vector3 spawnPosition = 0.5f * Vector3.one + new Vector3(chunkPosition.x * chunkSize + blockPosition.x, 
+                chunkPosition.y * chunkSize + blockPosition.y, chunkPosition.z * chunkSize + blockPosition.z);
+            
+            return Instantiate(wireframeBlockPrefab, spawnPosition, Quaternion.identity);
+        }
+        return null;
     }
 
     public void DestroyBlock(RaycastHit hit)
@@ -92,7 +101,20 @@ public class ChunkedWorldManager : MonoBehaviour
         chunks[chunkPosition.x, chunkPosition.y, chunkPosition.z].DestroyBlock(blockPosition);
     }
 
-    public void AddBlock(RaycastHit hit, int blockType)
+    private bool isCollidingWithPlayer(Vector3 playerPosition, Vector3Int blockPosition, Vector3Int chunkPosition)
+    {
+        // get position of player in chunk and block coordinates
+        Vector3Int playerPosChunk = World2ChunkCoords(playerPosition);
+        Vector3Int playerPosBlock = World2BlockCoords(playerPosition);
+
+        if (playerPosChunk.x == chunkPosition.x && playerPosChunk.z == chunkPosition.z)
+            if (playerPosBlock.x == blockPosition.x && playerPosBlock.z == blockPosition.z)
+                return true;
+            else return false;
+        else return false;
+    }
+
+    public void AddBlock(RaycastHit hit, int blockType, Vector3 playerPosition)
     {
         // position of a new block in world coords
         Vector3 spawnPosition = hit.point + hit.normal / 2.0f;
@@ -102,8 +124,9 @@ public class ChunkedWorldManager : MonoBehaviour
         // get coords of the chunk where a new block will be spawned in chunk coords
         Vector3Int chunkPosition = World2ChunkCoords(spawnPosition);
 
-        // add block to chunk
-        chunks[chunkPosition.x, chunkPosition.y, chunkPosition.z].AddBlock(blockPosition, blockType);
+        // add block to chunk (if player is not colliding with the new block)
+        if ( !isCollidingWithPlayer(playerPosition, blockPosition, chunkPosition))
+            chunks[chunkPosition.x, chunkPosition.y, chunkPosition.z].AddBlock(blockPosition, blockType);
     }
 
     public int GetHeightForPosition(int x, int z)

@@ -71,21 +71,15 @@ public class ChunkedWorldManager : MonoBehaviour
 
     public Vector3 GetWireframePosition(RaycastHit hit)
     {
-        // chunk position and new block position in local/chunk/block coords
-        Vector3Int chunkPosition = World2ChunkCoords(hit.transform.position);
-        Vector3Int blockPosition = World2BlockCoords(hit.point);
+        // position of a new block in world coords
+        Vector3 spawnPosition = hit.point + hit.normal / 2.0f;
 
-        // spawn position for a new block
-        Vector3 spawnBlockPosition = blockPosition + hit.normal / 2.0f;
+        // get coords of a new block int block coords
+        Vector3Int blockPosition = World2BlockCoords(spawnPosition);
+        // get coords of the chunk where a new block will be spawned in chunk coords
+        Vector3Int chunkPosition = World2ChunkCoords(spawnPosition);
 
-        // check whether spawn position is in current chunk or in neghbourhood one and adjust chunk and spawn position
-        if (isOutsideChunk(ref spawnBlockPosition, ref chunkPosition))
-        {
-            Debug.Log("Outside chunk");
-            // check whether a new chunk needs to be added TODO !!!
-        }
-
-        return new Vector3(chunkPosition.x * chunkSize + (int)spawnBlockPosition.x, chunkPosition.y * chunkSize + (int)spawnBlockPosition.y, chunkPosition.z * chunkSize + (int)spawnBlockPosition.z);
+        return new Vector3(chunkPosition.x * chunkSize + blockPosition.x, chunkPosition.y * chunkSize + blockPosition.y, chunkPosition.z * chunkSize + blockPosition.z);
     }
 
     public void DestroyBlock(RaycastHit hit)
@@ -99,65 +93,16 @@ public class ChunkedWorldManager : MonoBehaviour
 
     public void AddBlock(RaycastHit hit, int blockType)
     {
-        // chunk position and new block position in local/chunk/block coords
-        Vector3Int chunkPosition = World2ChunkCoords(hit.transform.position);
-        Vector3Int blockPosition = World2BlockCoords(hit.point);
+        // position of a new block in world coords
+        Vector3 spawnPosition = hit.point + hit.normal / 2.0f;
 
-        // spawn position for a new block
-        Vector3 spawnBlockPosition = blockPosition + hit.normal / 2.0f;
-
-        // check whether spawn position is in current chunk or in neghbourhood one and adjust chunk and spawn position
-        if (isOutsideChunk(ref spawnBlockPosition, ref chunkPosition))
-        {
-            Debug.Log("Outside chunk");
-            // check whether a new chunk needs to be added TODO !!!
-        }
+        // get coords of a new block int block coords
+        Vector3Int blockPosition = World2BlockCoords(spawnPosition);
+        // get coords of the chunk where a new block will be spawned in chunk coords
+        Vector3Int chunkPosition = World2ChunkCoords(spawnPosition);
 
         // add block to chunk
-        chunks[chunkPosition.x, chunkPosition.y, chunkPosition.z].AddBlock(spawnBlockPosition, blockType);
-    }
-
-    private bool isOutsideChunk(ref Vector3 blockPosition, ref Vector3Int chunkPosition)
-    {
-        if (blockPosition.x < 0.0f)
-        {
-            blockPosition.x = chunkSize - 1;
-            chunkPosition += Vector3Int.left;
-            return true;
-        }
-        if (blockPosition.y < 0.0f)
-        {
-            blockPosition.y = chunkSize - 1;
-            chunkPosition += Vector3Int.down;
-            return true;
-        }
-        if (blockPosition.z < 0.0f)
-        {
-            blockPosition.z = chunkSize - 1;
-            chunkPosition += new Vector3Int(0, 0, -1);
-            return true;
-        }
-
-        if (blockPosition.x > 15.0f)
-        {
-            blockPosition.x = 0;
-            chunkPosition += Vector3Int.right;
-            return true;
-        }
-        if (blockPosition.y > 15.0f)
-        {
-            blockPosition.y = 0;
-            chunkPosition += Vector3Int.up;
-            return true;
-        }
-        if (blockPosition.z > 15.0f)
-        {
-            blockPosition.z = 0;
-            chunkPosition += new Vector3Int(0, 0, 1);
-            return true;
-        }
-
-        return false;
+        chunks[chunkPosition.x, chunkPosition.y, chunkPosition.z].AddBlock(blockPosition, blockType);
     }
 
     public int GetHeightForPosition(int x, int z)

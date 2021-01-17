@@ -13,16 +13,16 @@ public class ChunkObject
     private const int chunkSize = ChunkedWorldManager.chunkSize;
     public int[,,] chunkGrid = new int[chunkSize, chunkSize, chunkSize];
 
-    public Vector3 position;
+    public Vector3Int position;
     private GameObject chunkGameObj;
 
     public static string[] blockTypes = new string[7] { "empty", "grass", "rock", "dirt", "sand", "snow", "water"};
 
-    public ChunkObject(Vector3 position, GameObject chunkPrefab)
+    public ChunkObject(Vector3 _position, GameObject chunkPrefab)
     {
-        this.position = position;
+        position = new Vector3Int((int)_position.x , (int)_position.y, (int)_position.z);
         // create chunk game object
-        chunkGameObj = MonoBehaviour.Instantiate(chunkPrefab, position, Quaternion.identity);
+        chunkGameObj = MonoBehaviour.Instantiate(chunkPrefab, _position, Quaternion.identity);
     }
 
     public void CreateChunkObject(bool withInit = true)
@@ -66,7 +66,7 @@ public class ChunkObject
         for (int x = 0; x < chunkSize; x++)
             for (int z = 0; z < chunkSize; z++)
             {
-                int height = ChunkedWorldManager.heightMap[x + (int)position.x, z + (int)position.z];
+                int height = ChunkedWorldManager.heightMap[x + position.x, z + position.z];
 
                 if (position.y <= height)
                 {
@@ -81,11 +81,11 @@ public class ChunkObject
             }
     }
 
-    public bool IsBlockAt(Vector3 position)
+    public bool IsBlockAt(Vector3 pos)
     {
-        int x = (int) position.x;
-        int y = (int) position.y;
-        int z = (int) position.z;
+        int x = (int)pos.x;
+        int y = (int)pos.y;
+        int z = (int)pos.z;
 
         // check whether there exists a block at the position
         if (x < 0 || x >= chunkSize ||
@@ -97,15 +97,40 @@ public class ChunkObject
         return (chunkGrid[x, y, z] != 0);
     }
 
-    public void DestroyBlock(Vector3 position)
+    public void DestroyBlock(Vector3Int pos)
     {
-        chunkGrid[(int)position.x, (int)position.y, (int)position.z] = 0;
+        // set occupied block as empty
+        chunkGrid[pos.x, pos.y, pos.z] = 0;
+
+        // update height map
+        if ( position.y + pos.y + 1 == ChunkedWorldManager.heightMap[position.x + pos.x, position.z + pos.z])
+        {
+            for (int y = pos.y - 1; y >= 0; y--)
+            {
+                if (chunkGrid[pos.x, pos.y, pos.z] != 0)
+                {
+                    ChunkedWorldManager.heightMap[position.x + pos.x, position.z + pos.z] = position.y + y;
+                    break;
+                }
+            }
+        }
+
+        // redraw whole chunk
         ReCreateChunkObject();
     }
 
-    public void AddBlock(Vector3 position, int blockType, bool recreateChunk = true)
+    public void AddBlock(Vector3Int pos, int blockType, bool recreateChunk = true)
     {
-        chunkGrid[(int)position.x, (int)position.y, (int)position.z] = blockType;
+        // set empty block as occupied (with its type)
+        chunkGrid[pos.x, pos.y, pos.z] = blockType;
+
+        // update height map
+        if (position.y + pos.y + 1 > ChunkedWorldManager.heightMap[position.x + pos.x, position.z + pos.z])
+        {
+            ChunkedWorldManager.heightMap[position.x + pos.x, position.z + pos.z] = position.y + pos.y + 1;
+        }
+
+        // redraw whole chunk
         if (recreateChunk) ReCreateChunkObject();
     }
 
@@ -132,9 +157,9 @@ public class ChunkObject
                 }
     }
 
-    public int GetBlockType(Vector3 position)
+    public int GetBlockType(Vector3 pos)
     {
-        return chunkGrid[(int)position.x, (int)position.y, (int)position.z];
+        return chunkGrid[(int)pos.x, (int)pos.y, (int)pos.z];
     }
 
     public void ReCreateChunkFromSave(ref ChunkData chunkData)

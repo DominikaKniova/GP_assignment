@@ -202,6 +202,7 @@ public class PlayerController : MonoBehaviour
     }
     private void DestroyBlock(RaycastHit hit)
     {
+        Debug.Log(hit.collider.name);
         if (hit.collider.tag == "Chunk")
         {
             startTime = Time.time;

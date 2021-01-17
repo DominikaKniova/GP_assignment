@@ -99,8 +99,6 @@ public class ChunkObject
 
     public void DestroyBlock(Vector3 position)
     {
-        Debug.Log("destroying object " + position);
-        if (chunkGrid[(int)position.x, (int)position.y, (int)position.z] == 0) Debug.Log("already not there");
         chunkGrid[(int)position.x, (int)position.y, (int)position.z] = 0;
         ReCreateChunkObject();
     }

@@ -65,7 +65,8 @@ public class ChunkedWorldManager : MonoBehaviour
     {
         // chunk position and block position in local/chunk/block coords
         Vector3Int chunkPosition = World2ChunkCoords(hit.transform.position);
-        Vector3Int blockPosition = World2BlockCoords(hit.point);
+        Vector3Int blockPosition = World2BlockCoords(hit.point - hit.normal / 2.0f);
+
         return chunks[chunkPosition.x, chunkPosition.y, chunkPosition.z].GetBlockType(blockPosition);
     }
 

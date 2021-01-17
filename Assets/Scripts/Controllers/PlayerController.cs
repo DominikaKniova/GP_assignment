@@ -49,6 +49,12 @@ public class PlayerController : MonoBehaviour
     }
     void Update()
     {
+        if (Time.timeScale == 0)
+        {
+            Destroy(lastWireframeBlock);
+            return;
+        }
+
         direction = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical")).normalized;
 
         if (isOnWorldEdge())

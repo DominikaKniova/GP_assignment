@@ -1,19 +1,67 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.Serialization.Formatters.Binary;
+using UnityEngine.SceneManagement;
 using System.IO;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
-    public GameObject player;
     public ChunkedWorldManager chunkedWorldManager;
+    public GameObject pauseMenu;
+    public GameObject gameplayUI;
 
     private string saveFileName = "gamesave.save";
-    
+
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            SwitchModes();   
+        }
+    }
+
+    private void SwitchModes()
+    {
+        if (Time.timeScale == 1)
+        {
+            HideScene();
+            pauseMenu.SetActive(true);
+            Time.timeScale = 0;
+        }
+        else
+        {
+            UnhideScene();
+            pauseMenu.SetActive(false);
+            Time.timeScale = 1;
+        }
+    }
+
+    private void HideScene()
+    {
+        gameplayUI.SetActive(false);
+        foreach (GameObject chunk in GameObject.FindGameObjectsWithTag("Chunk"))
+        {
+            chunk.GetComponent<MeshRenderer>().enabled = false;
+        }
+    }
+
+    private void UnhideScene()
+    {
+        gameplayUI.SetActive(true);
+        foreach (GameObject chunk in GameObject.FindGameObjectsWithTag("Chunk"))
+        {
+            chunk.GetComponent<MeshRenderer>().enabled = true;
+        }
+    }
+
+    public void StartGame()
+    {
+        SceneManager.LoadScene("GameScene");
+    }
+
     public void SaveGame()
     {
-
         SaveData save = new SaveData();
 
         for (int y = 0; y < ChunkedWorldManager.numChunk; y++)
@@ -48,6 +96,8 @@ public class GameManager : MonoBehaviour
         FileStream file = File.Create(Application.persistentDataPath + "/" + saveFileName);
         bf.Serialize(file, save);
         file.Close();
+
+        SwitchModes();
     }
 
     public void LoadGame()
@@ -71,11 +121,23 @@ public class GameManager : MonoBehaviour
                 chunkedWorldManager.chunks[chunkPos.x, chunkPos.y, chunkPos.z].ReCreateChunkFromSave(ref chunkData);
             }
 
-            player.transform.position = save.playerPosition.ToVector3();
+            GameObject.FindWithTag("Player").transform.position = save.playerPosition.ToVector3();
 
             Debug.Log("Loading successful");
         }
         else
             Debug.LogError("Loading unsuccessful");
+
+        SwitchModes();
+    }
+
+    public void RestartGame()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        Time.timeScale = 1;
+    }
+    public void Exit()
+    {
+        Application.Quit();
     }
 }

@@ -8,6 +8,7 @@ TagManager:
   - Ground
   - WorldBorder
   - Chunk
+  - Menu
   layers:
   - Default
   - TransparentFX

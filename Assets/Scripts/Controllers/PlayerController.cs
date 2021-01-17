@@ -44,7 +44,7 @@ public class PlayerController : MonoBehaviour
         // set init player position
         float worldCenter = ChunkedWorldManager.worldSize / 2.0f;
         transform.position = worldCenter * (Vector3.right + Vector3.forward);
-        int height = chunkedWorldManager.GetHeightForPosition(transform.position);
+        int height = chunkedWorldManager.GetHeightForPosition((int) transform.position.x, (int) transform.position.z);
         transform.position += (height+2) * Vector3.up;
     }
     void Update()
@@ -54,14 +54,10 @@ public class PlayerController : MonoBehaviour
         if (isOnWorldEdge())
         {
             canMove = false;
-            float worldCenter = ChunkedWorldManager.worldSize / 2.0f;
-            transform.position = worldCenter * (Vector3.right + Vector3.forward);
-            int height = chunkedWorldManager.GetHeightForPosition(transform.position);
-            transform.position += (height + 2) * Vector3.up;
             Debug.Log("Generate new world");
             chunkedWorldManager.ReGenerateWorld();
+            transform.position = GetPositionInNewWorld();
             canMove = true;
-
         }
 
         if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
@@ -166,14 +162,21 @@ public class PlayerController : MonoBehaviour
 
     private bool isOnWorldEdge()
     {
-        if (transform.position.x < 0 || transform.position.y < 0 || transform.position.z < 0
-            || transform.position.x > ChunkedWorldManager.worldSize || transform.position.y > ChunkedWorldManager.worldSize ||
-            transform.position.z > ChunkedWorldManager.worldSize)
+        if (transform.position.x < 0 || transform.position.x > ChunkedWorldManager.worldSize 
+            || transform.position.z < 0 || transform.position.z > ChunkedWorldManager.worldSize)
         {
             Debug.Log("On edge");
             return true;
         }
         return false;
+    }
+
+    private Vector3 GetPositionInNewWorld()
+    {
+        float x = Mathf.Repeat(transform.position.x, ChunkedWorldManager.worldSize);
+        float z = Mathf.Repeat(transform.position.z, ChunkedWorldManager.worldSize);
+        int y = chunkedWorldManager.GetHeightForPosition((int) x, (int) z);
+        return new Vector3(x, y + 2, z);
     }
     
     private bool CastRay(out RaycastHit hit)

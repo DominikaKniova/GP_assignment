@@ -129,7 +129,7 @@ public class GameManager : MonoBehaviour
                 chunkedWorldManager.chunks[chunkPos.x, chunkPos.y, chunkPos.z].ReCreateChunkFromSave(ref chunkData);
             }
 
-            GameObject.FindWithTag("Player").transform.position = save.playerPosition.ToVector3();
+            GameObject.FindWithTag("Player").transform.position = new Vector3(save.playerPosition.x, save.playerPosition.y, save.playerPosition.z) + Vector3.one * 0.5f;
 
             Debug.Log("Loading successful");
         }

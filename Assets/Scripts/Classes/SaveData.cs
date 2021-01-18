@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/* Serializable version of Vector3Int */
 [System.Serializable]
 public struct Vector3S
 {
     public int x;
     public int y;
     public int z;
-
     public Vector3S(Vector3Int v)
     {
         x = v.x;
@@ -21,12 +21,9 @@ public struct Vector3S
         y = _y;
         z = _z;
     }
-    public Vector3 ToVector3()
-    {
-        return new Vector3(x, y, z);
-    }
 }
 
+/* Data structure for creating saves */
 [System.Serializable]
 public class ChunkData
 {
@@ -34,6 +31,7 @@ public class ChunkData
     public List<byte> blockTypes = new List<byte>();
 }
 
+/* Data structure for creating saves */
 [System.Serializable]
 public class SaveData
 {

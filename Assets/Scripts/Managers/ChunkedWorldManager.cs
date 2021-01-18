@@ -124,7 +124,7 @@ public class ChunkedWorldManager : MonoBehaviour
         return false;
     }
 
-    public void AddBlock(RaycastHit hit, int blockType, Vector3 playerPosition)
+    public void AddBlock(RaycastHit hit, byte blockType, Vector3 playerPosition)
     {
         // check if hit point is out of world bounds
         if (isOutOfWorld(hit.point)) return;

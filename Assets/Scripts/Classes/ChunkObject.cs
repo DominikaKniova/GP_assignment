@@ -11,7 +11,7 @@ public class ChunkObject
     public List<Vector2> UVs = new List<Vector2>();
 
     private const int chunkSize = ChunkedWorldManager.chunkSize;
-    public int[,,] chunkGrid = new int[chunkSize, chunkSize, chunkSize];
+    public byte[,,] chunkGrid = new byte[chunkSize, chunkSize, chunkSize];
 
     public Vector3Int position;
     private GameObject chunkGameObj;
@@ -55,10 +55,24 @@ public class ChunkObject
                 { 
                     if (chunkGrid[x, y, z] != 0)
                     {
-                        BlockGeometry block = new BlockGeometry(this, new Vector3(x, y, z), blockTypes[chunkGrid[x, y, z]]);
+                        BlockGeometry block = new BlockGeometry(this, new Vector3(x, y, z), chunkGrid[x, y, z]);
                         block.CreateFilteredBlockMesh();
                     }
                 }
+    }
+
+    private byte GenerateChunkType(int h)
+    {
+        // make transitions between water and sand obvious
+        if (h < 6) return (byte) Meshes.Cube.Type.WATER; 
+        if (h >= 6 && h < 9) return (byte)Meshes.Cube.Type.SAND;
+
+        // add noise to height to make transitions less obvious
+        h += Random.Range(0, 5);
+        if (h >= 9 && h < 14) return (byte)Meshes.Cube.Type.GRASS;
+        if (h >= 14 && h < 20) return (byte)Meshes.Cube.Type.DIRT;
+        if (h >= 20 && h < 28) return (byte)Meshes.Cube.Type.ROCK;
+        return (byte)Meshes.Cube.Type.SNOW;
     }
 
     private void InitBlocksHeightMapBased()
@@ -73,9 +87,7 @@ public class ChunkObject
                     height = position.y + chunkSize <= height ? chunkSize : height % chunkSize;
                     for (int y = 0; y < height; y++)
                     {
-                        if (position.y + y < 10) chunkGrid[x, y, z] = 6;
-                        else if (position.y + y > 20) chunkGrid[x, y, z] = 5;
-                        else chunkGrid[x, y, z] = 1;
+                        chunkGrid[x, y, z] = GenerateChunkType(position.y + y);
                     }
                 }
             }
@@ -119,7 +131,7 @@ public class ChunkObject
         ReCreateChunkObject();
     }
 
-    public void AddBlock(Vector3Int pos, int blockType, bool recreateChunk = true)
+    public void AddBlock(Vector3Int pos, byte blockType, bool recreateChunk = true)
     {
         // set empty block as occupied (with its type)
         chunkGrid[pos.x, pos.y, pos.z] = blockType;
@@ -157,7 +169,7 @@ public class ChunkObject
                 }
     }
 
-    public int GetBlockType(Vector3 pos)
+    public byte GetBlockType(Vector3 pos)
     {
         return chunkGrid[(int)pos.x, (int)pos.y, (int)pos.z];
     }
@@ -166,7 +178,7 @@ public class ChunkObject
     {
         for (int i = 0; i < chunkData.blockPositions.Count; i++)
         {
-            chunkGrid[chunkData.blockPositions[i].x, chunkData.blockPositions[i].y, chunkData.blockPositions[i].z] = chunkData.blockTypes[i];
+            chunkGrid[chunkData.blockPositions[i].x, chunkData.blockPositions[i].y, chunkData.blockPositions[i].z] = (byte) chunkData.blockTypes[i];
         }
         CreateChunkObject(false);
     }

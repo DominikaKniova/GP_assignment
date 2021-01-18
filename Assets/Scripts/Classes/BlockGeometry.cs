@@ -6,8 +6,8 @@ public class BlockGeometry
 {
     public ChunkObject parent;
     public Vector3 position;
-    public string blockType;
-    public BlockGeometry(ChunkObject parent, Vector3 position, string blockType)
+    public byte blockType;
+    public BlockGeometry(ChunkObject parent, Vector3 position, byte blockType)
     {
         this.parent = parent;
         this.position = position;
@@ -27,7 +27,7 @@ public class BlockGeometry
         }
 
         // texture coords based on blockType
-        parent.UVs.AddRange(Meshes.Cube.atlasUVs[blockType]);
+        parent.UVs.AddRange(Meshes.Cube.atlasUVs[Meshes.Cube.blockTypes[blockType]]);
     }
     public void CreateBlockMesh()
     {

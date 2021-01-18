@@ -18,22 +18,6 @@ public static class Meshes
 			new Vector3 (0, 0, 1),
 		};
 
-		//public static int[] triangles = 
-		//{
-		//	0, 2, 1, //face front
-		//	0, 3, 2,
-		//	2, 3, 4, //face top
-		//	2, 4, 5,
-		//	1, 2, 5, //face right
-		//	1, 5, 6,
-		//	0, 7, 4, //face left
-		//	0, 4, 3,
-		//	5, 4, 7, //face back
-		//	5, 7, 6,
-		//	0, 6, 7, //face bottom
-		//	0, 1, 6
-		//};
-
 		public static string[] faceOrder = new string[] { "front", "top", "right", "left", "back", "bottom" };
 
 		public static Dictionary<string, List<Vector3>> vertices = new Dictionary<string, List<Vector3>>
@@ -135,24 +119,17 @@ public static class Meshes
 			},
 		};
 
-		public static List<Vector2> atlasUV(string blockType)
-        {
-			Vector2 coords = atlasCoords[blockType];
-
-			float startU = coords.x * atlasOffU;
-			float startV = coords.y * atlasOffV;
-			float endU = (coords.x + 1) * atlasOffU;
-			float endV = (coords.y + 1) * atlasOffV;
-
-			List<Vector2> tex = new List<Vector2>
-			{
-				new Vector2 (startU, startV),
-				new Vector2 (endU, startV),
-				new Vector2 (endU, endV),
-				new Vector2 (startU, endV),
-			};
-
-			return tex;
+		public static string[] blockTypes = new string[7] { "empty", "grass", "rock", "dirt", "sand", "snow", "water" };
+		
+		public enum Type
+		{
+			EMPTY,
+			GRASS,
+			ROCK,
+			DIRT,
+			SAND,
+			SNOW,
+			WATER
 		}
 	}
 }

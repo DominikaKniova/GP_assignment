@@ -22,7 +22,7 @@ public class PlayerController : MonoBehaviour
     private GameObject lastWireframeBlock;
     private Vector3 centerScreenPoint;
     private bool buildMode = false;
-    private int currentBlockType = 1;   
+    private byte currentBlockType = 1;   
 
     // block destroying variables
     private float startTime;

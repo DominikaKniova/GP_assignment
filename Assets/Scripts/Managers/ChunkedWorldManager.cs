@@ -184,4 +184,18 @@ public class ChunkedWorldManager : MonoBehaviour
         ClearChunks();
     }
 
+    public Vector3 GetHighPosition()
+    {
+        // get random position in the world that is high
+        for (int x = worldSize/2; x < worldSize; x++)
+            for (int z = worldSize / 2; z < worldSize; z++)
+            {
+                if (heightMap[x, z] >= 18)
+                {
+                    return new Vector3(x, heightMap[x, z], z);
+                }
+            }
+        return Vector3.zero;
+    }
+
 }

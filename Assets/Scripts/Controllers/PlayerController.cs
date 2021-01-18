@@ -41,11 +41,8 @@ public class PlayerController : MonoBehaviour
         centerScreenPoint = new Vector3(Camera.main.pixelWidth / 2.0f, Camera.main.pixelHeight / 2.0f, 0);
         playerSpeedSqr = playerSpeed * playerSpeed;
 
-        // set init player position
-        float worldCenter = ChunkedWorldManager.worldSize / 2.0f;
-        transform.position = worldCenter * (Vector3.right + Vector3.forward);
-        int height = chunkedWorldManager.GetHeightForPosition((int) transform.position.x, (int) transform.position.z);
-        transform.position += (height+2) * Vector3.up;
+        // position the player
+        SetInitPlayerPosition();
     }
     void Update()
     {
@@ -182,6 +179,24 @@ public class PlayerController : MonoBehaviour
         return false;
     }
 
+    private void SetInitPlayerPosition()
+    {
+        // try to position the player somewhere high 
+        Vector3 highPosition = chunkedWorldManager.GetHighPosition();
+
+        if (highPosition.Equals(Vector3.zero))
+        {
+            // nothing high was found, so position the player in the center of world
+            float worldCenter = ChunkedWorldManager.worldSize / 2.0f;
+            transform.position = worldCenter * (Vector3.right + Vector3.forward);
+            int height = chunkedWorldManager.GetHeightForPosition((int)transform.position.x, (int)transform.position.z);
+            transform.position += (height + 2) * Vector3.up;
+        }
+        else
+        {
+            transform.position = highPosition + 0.5f * Vector3.one + 2 * Vector3.up;
+        }
+    }
     private Vector3 GetPositionInNewWorld()
     {
         float x = Mathf.Repeat(transform.position.x, ChunkedWorldManager.worldSize);

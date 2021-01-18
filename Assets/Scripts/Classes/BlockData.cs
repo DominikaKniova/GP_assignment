@@ -117,7 +117,17 @@ public static class BlockData
 		},
 	};
 
-	public static string[] intType2string = new string[7] { "empty", "grass", "rock", "dirt", "sand", "snow", "water" };
+	public static string[] numType2string = new string[7] { "empty", "grass", "rock", "dirt", "sand", "snow", "water" };
+
+	public static Dictionary<string, float> destroyTimes = new Dictionary<string, float>
+	{
+		{"grass", 1},
+		{"rock", 4},
+		{"dirt", 3},
+		{"sand", 2},
+		{"snow", 4},
+		{"water", 2},
+	};
 		
 	public enum Type
 	{

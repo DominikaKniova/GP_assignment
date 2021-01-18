@@ -62,13 +62,15 @@ public class ChunkedWorldManager : MonoBehaviour
         return blockCoords;
     }
 
-    public int GetBlockType(RaycastHit hit)
+    public float GetDestroyTime(RaycastHit hit)
     {
         // chunk position and block position in local/chunk/block coords
         Vector3Int chunkPosition = World2ChunkCoords(hit.transform.position);
         Vector3Int blockPosition = World2BlockCoords(hit.point - hit.normal / 2.0f);
 
-        return chunks[chunkPosition.x, chunkPosition.y, chunkPosition.z].GetBlockType(blockPosition);
+        byte type = chunks[chunkPosition.x, chunkPosition.y, chunkPosition.z].GetBlockType(blockPosition);
+
+        return BlockData.destroyTimes[BlockData.numType2string[type]];
     }
 
     public GameObject SnapWireframeBlock(RaycastHit hit, Vector3 playerPosition)

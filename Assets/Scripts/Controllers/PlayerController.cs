@@ -230,7 +230,7 @@ public class PlayerController : MonoBehaviour
         if (hit.collider.tag == "Chunk")
         {
             startTime = Time.time;
-            destroyTime = (float) chunkedWorldManager.GetBlockType(hit);
+            destroyTime = chunkedWorldManager.GetDestroyTime(hit);
             isDestroying = true;
             destroyObjectHit = hit;
         }

@@ -27,7 +27,7 @@ public class BlockGeometry
         }
 
         // texture coords based on blockType
-        parent.UVs.AddRange(BlockData.atlasUVs[BlockData.intType2string[blockType]]);
+        parent.UVs.AddRange(BlockData.atlasUVs[BlockData.numType2string[blockType]]);
     }
     public void CreateBlockMesh()
     {

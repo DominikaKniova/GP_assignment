@@ -7,12 +7,13 @@ public class PlayerController : MonoBehaviour
 
     // movement variables
     private Rigidbody playerRb;
+    private CapsuleCollider capsCollider;
     private Vector3 direction;
 
-    private float playerSpeed = 3.0f;
-    private float jumpForce = 4.5f;
+    private float playerSpeed = 3f;
+    private float playerSpeedSqr;
+    private float jumpForce = 5;
 
-    public bool isGrounded;
     private bool doJump;
     private bool canMove = true;
 
@@ -33,13 +34,12 @@ public class PlayerController : MonoBehaviour
     public delegate void ProgressEventHandler(float progress);
     public event ProgressEventHandler ProgressTo;
     
-    // wireframe block prefab
-
-
     void Start()
     {
         playerRb = GetComponent<Rigidbody>();
+        capsCollider = GetComponent<CapsuleCollider>();
         centerScreenPoint = new Vector3(Camera.main.pixelWidth / 2.0f, Camera.main.pixelHeight / 2.0f, 0);
+        playerSpeedSqr = playerSpeed * playerSpeed;
 
         // set init player position
         float worldCenter = ChunkedWorldManager.worldSize / 2.0f;
@@ -55,7 +55,12 @@ public class PlayerController : MonoBehaviour
             return;
         }
 
-        direction = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical")).normalized;
+        if (Input.GetKeyDown(KeyCode.Space) && IsGrounded())
+        {
+            doJump = true;
+        }
+
+        direction = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
 
         if (isOnWorldEdge())
         {
@@ -64,11 +69,6 @@ public class PlayerController : MonoBehaviour
             chunkedWorldManager.ReGenerateWorld();
             transform.position = GetPositionInNewWorld();
             canMove = true;
-        }
-
-        if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
-        {
-            doJump = true;
         }
 
         if (Input.GetKeyDown(KeyCode.B))
@@ -143,10 +143,11 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    void OnCollisionEnter(Collision collision)
+    private bool IsGrounded()
     {
-        isGrounded = true;
+        return Physics.Raycast(transform.position, -Vector3.up, capsCollider.bounds.extents.y + 0.1f);
     }
+    
     void FixedUpdate()
     {
         if (canMove)
@@ -155,14 +156,18 @@ public class PlayerController : MonoBehaviour
 
     private void MovePlayer()
     {
-        playerRb.MovePosition(transform.position 
-            + (transform.forward * direction.z + transform.right * direction.x).normalized * Time.fixedDeltaTime * playerSpeed);
+        Vector3 dir = transform.forward * direction.z + transform.right * direction.x;
+
+        //if (Mathf.Pow(playerRb.velocity.x, 2) + Mathf.Pow(playerRb.velocity.z, 2) < playerSpeedSqr)
+        //    playerRb.AddForce(dir * playerSpeed, ForceMode.Impulse);
+
+        playerRb.MovePosition(transform.position + dir * Time.fixedDeltaTime * playerSpeed);
+        //transform.Translate(direction * playerSpeed * Time.fixedDeltaTime);
 
         if (doJump)
         {
-            isGrounded = false;
             doJump = false;
-            playerRb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+            playerRb.AddForce(Vector3.up * jumpForce, ForceMode.VelocityChange);
         }
     }
 

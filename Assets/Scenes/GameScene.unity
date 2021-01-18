@@ -862,6 +862,22 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 317770880205430083, guid: eb74ff5e86ef2c34ab2384689db4f977,
+        type: 3}
+      propertyPath: m_Radius
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 317770880205430083, guid: eb74ff5e86ef2c34ab2384689db4f977,
+        type: 3}
+      propertyPath: m_Material
+      value: 
+      objectReference: {fileID: 13400000, guid: 4a39391d64cf0fe4e9dffddec8421947,
+        type: 2}
+    - target: {fileID: 317770880205430083, guid: eb74ff5e86ef2c34ab2384689db4f977,
+        type: 3}
+      propertyPath: m_Direction
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1672497581232099728, guid: eb74ff5e86ef2c34ab2384689db4f977,
         type: 3}
       propertyPath: pauseMenu
@@ -888,6 +904,36 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 4753792605222422813, guid: 9723a06b7ba239442bbf04077fad1b5c,
         type: 3}
+    - target: {fileID: 3405035004785950813, guid: eb74ff5e86ef2c34ab2384689db4f977,
+        type: 3}
+      propertyPath: m_Drag
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3405035004785950813, guid: eb74ff5e86ef2c34ab2384689db4f977,
+        type: 3}
+      propertyPath: m_Mass
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3405035004785950813, guid: eb74ff5e86ef2c34ab2384689db4f977,
+        type: 3}
+      propertyPath: m_Constraints
+      value: 112
+      objectReference: {fileID: 0}
+    - target: {fileID: 3405035004785950813, guid: eb74ff5e86ef2c34ab2384689db4f977,
+        type: 3}
+      propertyPath: m_Interpolate
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3405035004785950813, guid: eb74ff5e86ef2c34ab2384689db4f977,
+        type: 3}
+      propertyPath: m_IsKinematic
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3405035004785950813, guid: eb74ff5e86ef2c34ab2384689db4f977,
+        type: 3}
+      propertyPath: m_CollisionDetection
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3684213266384009656, guid: eb74ff5e86ef2c34ab2384689db4f977,
         type: 3}
       propertyPath: m_Name

@@ -4,15 +4,19 @@ using UnityEngine;
 
 public class WorldManager : MonoBehaviour
 {
+    // world parameters
     public const int chunkSize = 16;
-    public const int numChunk = 6;
-    public const int worldSize = chunkSize * numChunk;
+    public const int numChunks = 6;
+    public const int worldSize = chunkSize * numChunks;
+    public static int[,] heightMap = new int[worldSize, worldSize];
 
+    // references to prefabs that will be spawned
     public GameObject chunkPrefab;
     public GameObject wireframeBlockPrefab;
 
-    public ChunkObject[,,] chunks = new ChunkObject[numChunk, numChunk, numChunk];
-    public static int[,] heightMap = new int[worldSize, worldSize];
+    // 3D grid storing all chunks in the world
+    public ChunkObject[,,] chunks = new ChunkObject[numChunks, numChunks, numChunks];
+
     void Awake()
     {
         // initialize world
@@ -24,11 +28,12 @@ public class WorldManager : MonoBehaviour
         FillWorldWithChunks();
     }
 
+    /* Initialize 3D grid of chunks */
     private void InitChunks()
     {
-        for (int y = 0; y < numChunk; y++)
-            for (int x = 0; x < numChunk; x++)
-                for (int z = 0; z < numChunk; z++)
+        for (int y = 0; y < numChunks; y++)
+            for (int x = 0; x < numChunks; x++)
+                for (int z = 0; z < numChunks; z++)
                 {
                     chunks[x, y, z] = new ChunkObject(new Vector3Int(x * chunkSize, y * chunkSize, z * chunkSize), chunkPrefab);
                 }
@@ -36,15 +41,16 @@ public class WorldManager : MonoBehaviour
 
     private void FillWorldWithChunks()
     {
-        for (int y = 0; y < numChunk; y++)
-            for (int x = 0; x < numChunk; x++)
-                for (int z = 0; z < numChunk; z++)
+        for (int y = 0; y < numChunks; y++)
+            for (int x = 0; x < numChunks; x++)
+                for (int z = 0; z < numChunks; z++)
                 {
                     chunks[x, y, z].CreateChunkObject();
                 }
     }
 
-    public Vector3Int World2ChunkCoords(Vector3 position)
+    /* Convert postion in world coordinates to position in chunk coordinates [0 ... chunkSize - 1])^3 */
+    private Vector3Int World2ChunkCoords(Vector3 position)
     {
         Vector3Int chunkCoords = Vector3Int.FloorToInt(position);
         chunkCoords.x /= chunkSize;
@@ -53,7 +59,8 @@ public class WorldManager : MonoBehaviour
         return chunkCoords;
     }
 
-    public Vector3Int World2BlockCoords(Vector3 position)
+    /* Convert postion in world coordinates to position in block coordinates [0 ... numChunks - 1])^3 */
+    private Vector3Int World2BlockCoords(Vector3 position)
     {
         Vector3Int blockCoords = Vector3Int.FloorToInt(position);
         blockCoords.x %= chunkSize;
@@ -61,18 +68,6 @@ public class WorldManager : MonoBehaviour
         blockCoords.z %= chunkSize;
         return blockCoords;
     }
-
-    public float GetDestroyTime(RaycastHit hit)
-    {
-        // chunk position and block position in local/chunk/block coords
-        Vector3Int chunkPosition = World2ChunkCoords(hit.transform.position);
-        Vector3Int blockPosition = World2BlockCoords(hit.point - hit.normal / 2.0f);
-
-        byte type = chunks[chunkPosition.x, chunkPosition.y, chunkPosition.z].GetBlockType(blockPosition);
-
-        return BlockData.destroyTimes[BlockData.numType2string[type]];
-    }
-
     public GameObject SnapWireframeBlock(RaycastHit hit, Vector3 playerPosition)
     {
         // check if hit point is out of world bounds
@@ -81,7 +76,7 @@ public class WorldManager : MonoBehaviour
         // position of a new block in world coords
         Vector3 blockPositionWorld = hit.point + hit.normal / 2.0f;
 
-        // get coords of a new block int block coords
+        // get coords of a new block in block coords
         Vector3Int blockPosition = World2BlockCoords(blockPositionWorld);
         // get coords of the chunk where a new block will be spawned in chunk coords
         Vector3Int chunkPosition = World2ChunkCoords(blockPositionWorld);
@@ -106,6 +101,33 @@ public class WorldManager : MonoBehaviour
         chunks[chunkPosition.x, chunkPosition.y, chunkPosition.z].DestroyBlock(blockPosition);
     }
 
+    public void AddBlock(RaycastHit hit, byte blockType, Vector3 playerPosition)
+    {
+        // check if hit point is out of world bounds
+        if (isOutOfWorld(hit.point)) return;
+
+        // position of a new block in world coords
+        Vector3 spawnPosition = hit.point + hit.normal / 2.0f;
+
+        // get coords of a new block in block coords
+        Vector3Int blockPosition = World2BlockCoords(spawnPosition);
+        // get coords of the chunk where a new block will be spawned in chunk coords
+        Vector3Int chunkPosition = World2ChunkCoords(spawnPosition);
+
+        // add block to chunk (if player is not colliding with the new block)
+        if ( !isCollidingWithPlayer(playerPosition, blockPosition, chunkPosition))
+            chunks[chunkPosition.x, chunkPosition.y, chunkPosition.z].AddBlock(blockPosition, blockType);
+    }
+
+    /* Check if position is out of world bounds */
+    private bool isOutOfWorld(Vector3 pos)
+    {
+        if (pos.x <= 0 || pos.x >= worldSize || pos.y <= 0 || pos.y >= worldSize || pos.z <= 0 || pos.z >= worldSize)
+            return true;
+        return false;
+    }
+
+    /* Check if player is positioned at the same place where it wants to add/show block */
     private bool isCollidingWithPlayer(Vector3 playerPosition, Vector3Int blockPosition, Vector3Int chunkPosition)
     {
         // get position of player in chunk and block coordinates
@@ -119,29 +141,15 @@ public class WorldManager : MonoBehaviour
         else return false;
     }
 
-    private bool isOutOfWorld(Vector3 pos)
+    public float GetDestroyTime(RaycastHit hit)
     {
-        if (pos.x <= 0 || pos.x >= worldSize || pos.y <= 0 || pos.y >= worldSize || pos.z <= 0 || pos.z >= worldSize)
-            return true;
-        return false;
-    }
+        // chunk position and block position in chunk/block coords
+        Vector3Int chunkPosition = World2ChunkCoords(hit.transform.position);
+        Vector3Int blockPosition = World2BlockCoords(hit.point - hit.normal / 2.0f);
 
-    public void AddBlock(RaycastHit hit, byte blockType, Vector3 playerPosition)
-    {
-        // check if hit point is out of world bounds
-        if (isOutOfWorld(hit.point)) return;
+        byte type = chunks[chunkPosition.x, chunkPosition.y, chunkPosition.z].GetBlockType(blockPosition);
 
-        // position of a new block in world coords
-        Vector3 spawnPosition = hit.point + hit.normal / 2.0f;
-
-        // get coords of a new block int block coords
-        Vector3Int blockPosition = World2BlockCoords(spawnPosition);
-        // get coords of the chunk where a new block will be spawned in chunk coords
-        Vector3Int chunkPosition = World2ChunkCoords(spawnPosition);
-
-        // add block to chunk (if player is not colliding with the new block)
-        if ( !isCollidingWithPlayer(playerPosition, blockPosition, chunkPosition))
-            chunks[chunkPosition.x, chunkPosition.y, chunkPosition.z].AddBlock(blockPosition, blockType);
+        return BlockData.destroyTimes[BlockData.numType2string[type]];
     }
 
     public int GetHeightForPosition(int x, int z)
@@ -151,9 +159,9 @@ public class WorldManager : MonoBehaviour
 
     private void ClearChunks()
     {
-        for (int y = 0; y < numChunk; y++)
-            for (int x = 0; x < numChunk; x++)
-                for (int z = 0; z < numChunk; z++)
+        for (int y = 0; y < numChunks; y++)
+            for (int x = 0; x < numChunks; x++)
+                for (int z = 0; z < numChunks; z++)
                 {
                     chunks[x, y, z].ClearChunk();
                 }
@@ -167,11 +175,13 @@ public class WorldManager : MonoBehaviour
                 heightMap[x, z] = 0;
             }
     }
+
+
+    /* Create new world with new random height map */
     public void ReGenerateWorld()
     {
         // destroy current world
         ClearChunks();
-        Debug.Log("done clear");
 
         // regenerate new height map for new terrain
         heightMap = TerrainGenerator.GenerateHeightMap(worldSize, worldSize, 10);
@@ -182,13 +192,14 @@ public class WorldManager : MonoBehaviour
 
     public void EmptyWorld()
     {
-        // empty scene
+        // destroy current world
         ClearChunks();
     }
 
+
+    /* Get random position in the world that is high (used for player's initial position ... to see the beauty of the world) */
     public Vector3 GetHighPosition()
     {
-        // get random position in the world that is high
         for (int x = worldSize/2; x < worldSize; x++)
             for (int z = worldSize / 2; z < worldSize; z++)
             {

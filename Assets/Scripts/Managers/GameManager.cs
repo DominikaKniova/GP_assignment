@@ -72,9 +72,9 @@ public class GameManager : MonoBehaviour
     {
         SaveData save = new SaveData();
 
-        for (int y = 0; y < WorldManager.numChunk; y++)
-            for (int x = 0; x < WorldManager.numChunk; x++)
-                for (int z = 0; z < WorldManager.numChunk; z++)
+        for (int y = 0; y < WorldManager.numChunks; y++)
+            for (int x = 0; x < WorldManager.numChunks; x++)
+                for (int z = 0; z < WorldManager.numChunks; z++)
                 {
                     ChunkData chunkData = new ChunkData();
                     Vector3S position = new Vector3S(x, y, z);

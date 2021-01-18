@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/* Class containing precomputed data for building/destroying blocks (cube mesh objects) */
 public static class BlockData
 {
 	private static List<Vector3> cubeVertices = new List<Vector3>
@@ -18,6 +19,7 @@ public static class BlockData
 
 	public static string[] faceOrder = new string[] { "front", "top", "right", "left", "back", "bottom" };
 
+	/* Array of vertices for each cube face */
 	public static Dictionary<string, List<Vector3>> vertices = new Dictionary<string, List<Vector3>>
 	{
 		{"front", new List<Vector3> { cubeVertices[0], cubeVertices[1], cubeVertices[2], cubeVertices[3] }},
@@ -28,16 +30,7 @@ public static class BlockData
 		{"bottom", new List<Vector3> { cubeVertices[1], cubeVertices[0], cubeVertices[7], cubeVertices[6] }},
 	};
 
-	public static Dictionary<string, List<int>> triangles = new Dictionary<string, List<int>>
-	{
-		{"front", new List<int> { 0, 2, 1, 0, 3, 2 }},
-		{"top", new List<int> { 2, 3, 4, 2, 4, 5 }},
-		{"right", new List<int> { 1, 2, 5, 1, 5, 6 }},
-		{"left", new List<int> { 0, 7, 4, 0, 4, 3 }},
-		{"back", new List<int> { 5, 4, 7, 5, 7, 6 }},
-		{"bottom", new List<int> { 0, 6, 7, 0, 1, 6 }},
-	};
-
+	/* Indices of block type materials in texture atlas */
 	public static Dictionary<string, Vector2> atlasCoords = new Dictionary<string, Vector2>
 	{
 		{"grass", new Vector2 (0, 1)},
@@ -51,15 +44,7 @@ public static class BlockData
 	public static float atlasOffU = 1.0f / 3.0f;
 	public static float atlasOffV = 1.0f / 2.0f;
 
-	public static List<Vector2> UVs = new List<Vector2>
-    {
-        new Vector2 (0, 0),
-        new Vector2 (1, 0),
-        new Vector2 (1, 1),
-        new Vector2 (0, 1),
-    };
-
-	// texture UV coordinates precomputed for every block type
+	/* Texture UV coordinates precomputed for every block type */
 	public static Dictionary<string, List<Vector2>> atlasUVs = new Dictionary<string, List<Vector2>>
 	{
 		{"grass", new List<Vector2>
@@ -119,6 +104,7 @@ public static class BlockData
 
 	public static string[] numType2string = new string[7] { "empty", "grass", "rock", "dirt", "sand", "snow", "water" };
 
+	/* Each block type has different destroy time */
 	public static Dictionary<string, float> destroyTimes = new Dictionary<string, float>
 	{
 		{"grass", 1},

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/* First person camera */
 public class CameraController : MonoBehaviour
 {
 
@@ -10,7 +11,8 @@ public class CameraController : MonoBehaviour
     private float yaw = 0.0f;
     private float pitch = 0.0f;
     private float speed = 2.5f;
-    private float rotationBound = 45.0f;
+    private float rotationBound = 60.0f;
+
     void Start()
     {
         playerTransform = transform.parent;

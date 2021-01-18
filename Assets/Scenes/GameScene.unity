@@ -904,6 +904,16 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 4753792605222422813, guid: 9723a06b7ba239442bbf04077fad1b5c,
         type: 3}
+    - target: {fileID: 2215862056364367494, guid: eb74ff5e86ef2c34ab2384689db4f977,
+        type: 3}
+      propertyPath: m_ClearFlags
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2215862056364367494, guid: eb74ff5e86ef2c34ab2384689db4f977,
+        type: 3}
+      propertyPath: far clip plane
+      value: 95
+      objectReference: {fileID: 0}
     - target: {fileID: 3405035004785950813, guid: eb74ff5e86ef2c34ab2384689db4f977,
         type: 3}
       propertyPath: m_Drag

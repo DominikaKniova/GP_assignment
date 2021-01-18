@@ -64,15 +64,15 @@ public class ChunkObject
     private byte GenerateChunkType(int h)
     {
         // make transitions between water and sand obvious
-        if (h < 6) return (byte) Meshes.Cube.Type.WATER; 
-        if (h >= 6 && h < 9) return (byte)Meshes.Cube.Type.SAND;
+        if (h < 6) return (byte) BlockData.Type.WATER; 
+        if (h >= 6 && h < 9) return (byte)BlockData.Type.SAND;
 
         // add noise to height to make transitions less obvious
         h += Random.Range(0, 5);
-        if (h >= 9 && h < 14) return (byte)Meshes.Cube.Type.GRASS;
-        if (h >= 14 && h < 20) return (byte)Meshes.Cube.Type.DIRT;
-        if (h >= 20 && h < 28) return (byte)Meshes.Cube.Type.ROCK;
-        return (byte)Meshes.Cube.Type.SNOW;
+        if (h >= 9 && h < 14) return (byte)BlockData.Type.GRASS;
+        if (h >= 14 && h < 20) return (byte)BlockData.Type.DIRT;
+        if (h >= 20 && h < 28) return (byte)BlockData.Type.ROCK;
+        return (byte)BlockData.Type.SNOW;
     }
 
     private void InitBlocksHeightMapBased()

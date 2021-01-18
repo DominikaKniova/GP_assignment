@@ -23,16 +23,16 @@ public class BlockGeometry
         // face vertices
         for (int i = 0; i < 4; i++)
         {
-            parent.vertices.Add(Meshes.Cube.vertices[side][i] + position);
+            parent.vertices.Add(BlockData.vertices[side][i] + position);
         }
 
         // texture coords based on blockType
-        parent.UVs.AddRange(Meshes.Cube.atlasUVs[Meshes.Cube.blockTypes[blockType]]);
+        parent.UVs.AddRange(BlockData.atlasUVs[BlockData.intType2string[blockType]]);
     }
     public void CreateBlockMesh()
     {
         // add all faces of the block
-        foreach (string face in Meshes.Cube.faceOrder)
+        foreach (string face in BlockData.faceOrder)
         {
             BlockSide(face);
         }
@@ -40,7 +40,7 @@ public class BlockGeometry
 
     public void CreateFilteredBlockMesh()
     {
-        // add only faces of blocks that are not adjacent to other block faces
+        // add only those faces of block that are not adjacent to other block faces
         if (!parent.IsBlockAt(position + Vector3.forward)) BlockSide("back");
         if (!parent.IsBlockAt(position - Vector3.forward)) BlockSide("front");
 

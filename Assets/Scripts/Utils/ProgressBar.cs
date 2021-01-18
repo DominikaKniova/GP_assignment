@@ -7,8 +7,6 @@ public class ProgressBar : MonoBehaviour
 {
     public Image progressBar;
     public GameObject player;
-
-    // Update is called once per frame
     void OnEnable()
     {
         player.GetComponent<PlayerController>().ProgressTo += ShowProgress;

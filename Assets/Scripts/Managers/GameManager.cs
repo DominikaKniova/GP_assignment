@@ -44,6 +44,7 @@ public class GameManager : MonoBehaviour
             
     }
 
+    /* Switch between game play and pause menu */
     private void SwitchModes()
     {
         if (Time.timeScale == 1)
@@ -101,6 +102,7 @@ public class GameManager : MonoBehaviour
         SceneManager.LoadScene("GameScene");
     }
 
+    /* Save current game state to file */
     public void SaveGame()
     {
         SaveData save = new SaveData();
@@ -119,20 +121,21 @@ public class GameManager : MonoBehaviour
                                 byte type = chunkedWorldManager.chunks[x, y, z].chunkGrid[i, j, k];
                                 if (type != 0)
                                 {
+                                    // store only occupied blocks
                                     chunkData.blockPositions.Add(new Vector3S(i, j, k));
                                     chunkData.blockTypes.Add(type);
                                 }
                             }
-
+                    // chunk stored in dictionary with its position as key
                     save.chunks.Add(position, chunkData);
                 }
 
+        // store player's position and heightMap
         Vector3 playerPos = GameObject.Find("Player").transform.position;
         save.playerPosition = new Vector3S((int)playerPos.x, (int)playerPos.y, (int)playerPos.z);
         save.heightMap = WorldManager.heightMap;
 
-        Debug.Log("Saving game to: " + Application.persistentDataPath);
-
+        Debug.Log("Saving game state to: " + Application.persistentDataPath);
         BinaryFormatter bf = new BinaryFormatter();
         FileStream file = File.Create(Application.persistentDataPath + "/" + saveFileName);
         bf.Serialize(file, save);
@@ -141,10 +144,12 @@ public class GameManager : MonoBehaviour
         SwitchModes();
     }
 
+    /* Load saved game state from file */
     public void LoadGame()
     {
         if (File.Exists(Application.persistentDataPath + "/" + saveFileName))
         {
+            // clear current world
             chunkedWorldManager.EmptyWorld();
 
             BinaryFormatter bf = new BinaryFormatter();
@@ -154,6 +159,7 @@ public class GameManager : MonoBehaviour
 
             WorldManager.heightMap = save.heightMap;
 
+            // recreate chunks
             foreach (KeyValuePair<Vector3S, ChunkData> item in save.chunks)
             {
                 Vector3S chunkPos = item.Key;
@@ -162,6 +168,7 @@ public class GameManager : MonoBehaviour
                 chunkedWorldManager.chunks[chunkPos.x, chunkPos.y, chunkPos.z].ReCreateChunkFromSave(ref chunkData);
             }
 
+            // position player
             GameObject.FindWithTag("Player").transform.position = new Vector3(save.playerPosition.x, save.playerPosition.y, save.playerPosition.z) + Vector3.one * 0.5f;
 
             Debug.Log("Loading successful");

@@ -17,6 +17,9 @@ public class PlayerController : MonoBehaviour
     private bool doJump;
     private bool canMove = true;
 
+    // raycast variables
+    private float rayLength = 10.0f;
+
     // build variables
     public ChunkedWorldManager chunkedWorldManager;
     private GameObject lastWireframeBlock;
@@ -24,7 +27,7 @@ public class PlayerController : MonoBehaviour
     private bool buildMode = false;
     private byte currentBlockType = 1;   
 
-    // block destroying variables
+    // block destroy variables
     private float startTime;
     private float destroyTime;
     private bool isDestroying;
@@ -208,7 +211,7 @@ public class PlayerController : MonoBehaviour
     private bool CastRay(out RaycastHit hit)
     {
         Ray ray = Camera.main.ScreenPointToRay(centerScreenPoint);
-        return Physics.Raycast(ray, out hit);
+        return Physics.Raycast(ray, out hit, rayLength);
     }
     private void ShowWireframeBlock(RaycastHit hit)
     {

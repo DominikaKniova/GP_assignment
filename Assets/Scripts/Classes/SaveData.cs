@@ -31,7 +31,7 @@ public struct Vector3S
 public class ChunkData
 {
     public List<Vector3S> blockPositions = new List<Vector3S>();
-    public List<int> blockTypes = new List<int>();
+    public List<byte> blockTypes = new List<byte>();
 }
 
 [System.Serializable]

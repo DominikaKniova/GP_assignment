@@ -30,7 +30,7 @@ public class WorldManager : MonoBehaviour
             for (int x = 0; x < numChunk; x++)
                 for (int z = 0; z < numChunk; z++)
                 {
-                    chunks[x, y, z] = new ChunkObject(new Vector3(x * chunkSize, y * chunkSize, z * chunkSize), chunkPrefab);
+                    chunks[x, y, z] = new ChunkObject(new Vector3Int(x * chunkSize, y * chunkSize, z * chunkSize), chunkPrefab);
                 }
     }
 

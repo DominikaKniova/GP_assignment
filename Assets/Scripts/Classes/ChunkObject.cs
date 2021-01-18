@@ -5,29 +5,29 @@ using UnityEngine;
 public class ChunkObject
 {
     private Mesh mesh;
+    private GameObject chunkGameObj;
 
+    private const int chunkSize = WorldManager.chunkSize;
+    public Vector3Int position;
+
+    // geometry buffers
     public List<Vector3> vertices = new List<Vector3>();
     public List<int> triangles = new List<int>();
     public List<Vector2> UVs = new List<Vector2>();
 
-    private const int chunkSize = WorldManager.chunkSize;
+    // 3D grid storing type of each block in this chunk
     public byte[,,] chunkGrid = new byte[chunkSize, chunkSize, chunkSize];
 
-    public Vector3Int position;
-    private GameObject chunkGameObj;
-
-    public static string[] blockTypes = new string[7] { "empty", "grass", "rock", "dirt", "sand", "snow", "water"};
-
-    public ChunkObject(Vector3 _position, GameObject chunkPrefab)
+    public ChunkObject(Vector3Int _position, GameObject chunkPrefab)
     {
-        position = new Vector3Int((int)_position.x , (int)_position.y, (int)_position.z);
+        position = _position;
         // create chunk game object
         chunkGameObj = MonoBehaviour.Instantiate(chunkPrefab, _position, Quaternion.identity);
     }
 
+    /* Create chunk's geometry with child blocks */
     public void CreateChunkObject(bool withInit = true)
     {
-        // generate chunk's geometry
         mesh = new Mesh();
         MeshFilter mf = chunkGameObj.GetComponent<MeshFilter>();
         MeshCollider mc = chunkGameObj.GetComponent<MeshCollider>();
@@ -42,29 +42,32 @@ public class ChunkObject
         mesh.RecalculateBounds();
         mesh.RecalculateNormals();
 
+        // initialize game object's components
         mf.mesh = mesh;
         mc.sharedMesh = mesh;
     }
 
-    private void FillChunkWithBlocks()
+    /* Based on randomly generated terraing height map initialize 3D chunkGrid with information about block types */
+    private void InitBlocksHeightMapBased()
     {
-        // create child blocks of this chunk
-        for (int y = 0; y < chunkSize; y++)
-            for (int x = 0; x < chunkSize; x++)
-                for (int z = 0; z < chunkSize; z++) 
-                { 
-                    if (chunkGrid[x, y, z] != 0)
-                    {
-                        BlockGeometry block = new BlockGeometry(this, new Vector3(x, y, z), chunkGrid[x, y, z]);
-                        block.CreateFilteredBlockMesh();
-                    }
+        for (int x = 0; x < chunkSize; x++)
+            for (int z = 0; z < chunkSize; z++)
+            {
+                int height = WorldManager.heightMap[x + position.x, z + position.z];
+                if (position.y <= height)
+                {
+                    height = position.y + chunkSize <= height ? chunkSize : height % chunkSize;
+                    for (int y = 0; y < height; y++)
+                        chunkGrid[x, y, z] = GenerateChunkType(position.y + y);
                 }
+            }
     }
 
+    /* Based on block's height decide its type */
     private byte GenerateChunkType(int h)
     {
-        // make transitions between water and sand obvious
-        if (h < 6) return (byte) BlockData.Type.WATER; 
+        // make transitions between water and sand straight
+        if (h < 6) return (byte)BlockData.Type.WATER;
         if (h >= 6 && h < 9) return (byte)BlockData.Type.SAND;
 
         // add noise to height to make transitions less obvious
@@ -75,38 +78,33 @@ public class ChunkObject
         return (byte)BlockData.Type.SNOW;
     }
 
-    private void InitBlocksHeightMapBased()
+    /* Fill chunk's geometry buffers with blocks */
+    private void FillChunkWithBlocks()
     {
-        for (int x = 0; x < chunkSize; x++)
-            for (int z = 0; z < chunkSize; z++)
-            {
-                int height = WorldManager.heightMap[x + position.x, z + position.z];
-
-                if (position.y <= height)
-                {
-                    height = position.y + chunkSize <= height ? chunkSize : height % chunkSize;
-                    for (int y = 0; y < height; y++)
+        // create child blocks of this chunk
+        for (int y = 0; y < chunkSize; y++)
+            for (int x = 0; x < chunkSize; x++)
+                for (int z = 0; z < chunkSize; z++) 
+                { 
+                    if (chunkGrid[x, y, z] != 0)   // 0 means empty block
                     {
-                        chunkGrid[x, y, z] = GenerateChunkType(position.y + y);
+                        BlockGeometry block = new BlockGeometry(this, new Vector3Int(x, y, z), chunkGrid[x, y, z]);
+                        // add only those faces of a block that will not be occluded by other blocks in this chunk
+                        block.CreateFilteredBlockMesh();
                     }
                 }
-            }
     }
 
-    public bool IsBlockAt(Vector3 pos)
+    /* Check whether there exists a block at position pos */
+    public bool IsBlockAt(Vector3Int pos)
     {
-        int x = (int)pos.x;
-        int y = (int)pos.y;
-        int z = (int)pos.z;
-
-        // check whether there exists a block at the position
-        if (x < 0 || x >= chunkSize ||
-            y < 0 || y >= chunkSize ||
-            z < 0 || z >= chunkSize)
+        if (pos.x < 0 || pos.x >= chunkSize ||
+            pos.y < 0 || pos.y >= chunkSize ||
+            pos.z < 0 || pos.z >= chunkSize)
         {
             return false;
         }
-        return (chunkGrid[x, y, z] != 0);
+        return (chunkGrid[pos.x, pos.y, pos.z] != 0);
     }
 
     public void DestroyBlock(Vector3Int pos)
@@ -133,7 +131,7 @@ public class ChunkObject
 
     public void AddBlock(Vector3Int pos, byte blockType, bool recreateChunk = true)
     {
-        // set empty block as occupied (with its type)
+        // set empty block as occupied (with its new type)
         chunkGrid[pos.x, pos.y, pos.z] = blockType;
 
         // update height map
@@ -158,27 +156,27 @@ public class ChunkObject
         CreateChunkObject(false);
     }
 
+    /* Clear chunk's whole geometry and set all its block as empty */
     public void ClearChunk()
     {
         ClearBuffers();
         for (int y = 0; y < chunkSize; y++)
             for (int x = 0; x < chunkSize; x++)
                 for (int z = 0; z < chunkSize; z++)
-                {
                     chunkGrid[x, y, z] = 0;
-                }
     }
 
-    public byte GetBlockType(Vector3 pos)
+    public byte GetBlockType(Vector3Int pos)
     {
-        return chunkGrid[(int)pos.x, (int)pos.y, (int)pos.z];
+        return chunkGrid[pos.x, pos.y, pos.z];
     }
 
+    /* Create chunk's geometry from saved file */
     public void ReCreateChunkFromSave(ref ChunkData chunkData)
     {
         for (int i = 0; i < chunkData.blockPositions.Count; i++)
         {
-            chunkGrid[chunkData.blockPositions[i].x, chunkData.blockPositions[i].y, chunkData.blockPositions[i].z] = (byte) chunkData.blockTypes[i];
+            chunkGrid[chunkData.blockPositions[i].x, chunkData.blockPositions[i].y, chunkData.blockPositions[i].z] = chunkData.blockTypes[i];
         }
         CreateChunkObject(false);
     }

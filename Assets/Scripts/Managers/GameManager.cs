@@ -83,7 +83,7 @@ public class GameManager : MonoBehaviour
                         for (int i = 0; i < WorldManager.chunkSize; i++)
                             for (int k = 0; k < WorldManager.chunkSize; k++)
                             {
-                                int type = chunkedWorldManager.chunks[x, y, z].chunkGrid[i, j, k];
+                                byte type = chunkedWorldManager.chunks[x, y, z].chunkGrid[i, j, k];
                                 if (type != 0)
                                 {
                                     chunkData.blockPositions.Add(new Vector3S(i, j, k));

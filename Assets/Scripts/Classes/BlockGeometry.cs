@@ -5,9 +5,9 @@ using UnityEngine;
 public class BlockGeometry
 {
     private ChunkObject parent;
-    private Vector3 position;
+    private Vector3Int position;
     private byte blockType;
-    public BlockGeometry(ChunkObject parent, Vector3 position, byte blockType)
+    public BlockGeometry(ChunkObject parent, Vector3Int position, byte blockType)
     {
         this.parent = parent;
         this.position = position;
@@ -45,13 +45,13 @@ public class BlockGeometry
     public void CreateFilteredBlockMesh()
     {
         // add only those that are not adjacent to other block faces
-        if (!parent.IsBlockAt(position + Vector3.forward)) BlockSide("back");
-        if (!parent.IsBlockAt(position - Vector3.forward)) BlockSide("front");
+        if (!parent.IsBlockAt(position + new Vector3Int(0, 0, 1))) BlockSide("back");
+        if (!parent.IsBlockAt(position - new Vector3Int(0, 0, 1))) BlockSide("front");
 
-        if (!parent.IsBlockAt(position + Vector3.right)) BlockSide("right");
-        if (!parent.IsBlockAt(position - Vector3.right)) BlockSide("left");
+        if (!parent.IsBlockAt(position + Vector3Int.right)) BlockSide("right");
+        if (!parent.IsBlockAt(position - Vector3Int.right)) BlockSide("left");
 
-        if (!parent.IsBlockAt(position + Vector3.up)) BlockSide("top");
-        if (!parent.IsBlockAt(position - Vector3.up)) BlockSide("bottom");
+        if (!parent.IsBlockAt(position + Vector3Int.up)) BlockSide("top");
+        if (!parent.IsBlockAt(position - Vector3Int.up)) BlockSide("bottom");
     }
 }

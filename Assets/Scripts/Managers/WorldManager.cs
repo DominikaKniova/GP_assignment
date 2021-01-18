@@ -98,8 +98,11 @@ public class WorldManager : MonoBehaviour
         Vector3Int chunkPosition = World2ChunkCoords(hit.transform.position);
         Vector3Int blockPosition = World2BlockCoords(hit.point - hit.normal / 2.0f);
 
-        chunks[chunkPosition.x, chunkPosition.y, chunkPosition.z].DestroyBlock(blockPosition);
+        // if block is in the lowest layer of terrain -> do not destroy
+        if (!isInLowestLayer(blockPosition))
+            chunks[chunkPosition.x, chunkPosition.y, chunkPosition.z].DestroyBlock(blockPosition);
     }
+            
 
     public void AddBlock(RaycastHit hit, byte blockType, Vector3 playerPosition)
     {
@@ -139,6 +142,14 @@ public class WorldManager : MonoBehaviour
                 return true;
             else return false;
         else return false;
+    }
+
+    /* Check if block is in lowest layer of the world */
+    private bool isInLowestLayer(Vector3Int blockPosition)
+    {
+        if (blockPosition.y == 0)
+                return true;
+        return false;
     }
 
     public float GetDestroyTime(RaycastHit hit)

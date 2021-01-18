@@ -19,8 +19,6 @@ public class GameManager : MonoBehaviour
         if (SceneManager.GetActiveScene().name == "GameScene")
         {
             inGameScene = true;
-
-            //Set Cursor to not be visible
             Cursor.visible = false;
         }
 
@@ -37,12 +35,14 @@ public class GameManager : MonoBehaviour
     {
         if (Time.timeScale == 1)
         {
+            Cursor.visible = true;
             HideScene();
             pauseMenu.SetActive(true);
             Time.timeScale = 0;
         }
         else
         {
+            Cursor.visible = false;
             UnhideScene();
             pauseMenu.SetActive(false);
             Time.timeScale = 1;

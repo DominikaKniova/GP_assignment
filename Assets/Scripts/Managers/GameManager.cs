@@ -11,14 +11,26 @@ public class GameManager : MonoBehaviour
     public GameObject pauseMenu;
     public GameObject gameplayUI;
 
-    private string saveFileName = "gamesave.save";
+    private bool inGameScene;
 
-    private void Update()
+    private string saveFileName = "gamesave.save";
+    private void Start()
     {
-        if (Input.GetKeyDown(KeyCode.Escape))
+        if (SceneManager.GetActiveScene().name == "GameScene")
         {
-            SwitchModes();   
+            inGameScene = true;
+
+            //Set Cursor to not be visible
+            Cursor.visible = false;
         }
+
+    }
+
+    void Update()
+    {
+        if (inGameScene)
+            if (Input.GetKeyDown(KeyCode.Escape))
+                    SwitchModes();   
     }
 
     private void SwitchModes()
@@ -41,18 +53,14 @@ public class GameManager : MonoBehaviour
     {
         gameplayUI.SetActive(false);
         foreach (GameObject chunk in GameObject.FindGameObjectsWithTag("Chunk"))
-        {
             chunk.GetComponent<MeshRenderer>().enabled = false;
-        }
     }
 
     private void UnhideScene()
     {
         gameplayUI.SetActive(true);
         foreach (GameObject chunk in GameObject.FindGameObjectsWithTag("Chunk"))
-        {
             chunk.GetComponent<MeshRenderer>().enabled = true;
-        }
     }
 
     public void StartGame()

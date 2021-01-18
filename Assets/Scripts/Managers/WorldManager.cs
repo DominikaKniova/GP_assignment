@@ -19,7 +19,7 @@ public class WorldManager : MonoBehaviour
         InitChunks();
 
         // generate random terrain
-        heightMap = TerrainManager.GenerateHeightMap(worldSize, worldSize, 10);
+        heightMap = TerrainGenerator.GenerateHeightMap(worldSize, worldSize, 10);
 
         FillWorldWithChunks();
     }
@@ -174,7 +174,7 @@ public class WorldManager : MonoBehaviour
         Debug.Log("done clear");
 
         // regenerate new height map for new terrain
-        heightMap = TerrainManager.GenerateHeightMap(worldSize, worldSize, 10);
+        heightMap = TerrainGenerator.GenerateHeightMap(worldSize, worldSize, 10);
 
         // build new world
         FillWorldWithChunks();

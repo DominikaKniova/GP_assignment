@@ -7,7 +7,7 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
-    public ChunkedWorldManager chunkedWorldManager;
+    public WorldManager chunkedWorldManager;
     public GameObject pauseMenu;
     public GameObject gameplayUI;
 
@@ -64,16 +64,16 @@ public class GameManager : MonoBehaviour
     {
         SaveData save = new SaveData();
 
-        for (int y = 0; y < ChunkedWorldManager.numChunk; y++)
-            for (int x = 0; x < ChunkedWorldManager.numChunk; x++)
-                for (int z = 0; z < ChunkedWorldManager.numChunk; z++)
+        for (int y = 0; y < WorldManager.numChunk; y++)
+            for (int x = 0; x < WorldManager.numChunk; x++)
+                for (int z = 0; z < WorldManager.numChunk; z++)
                 {
                     ChunkData chunkData = new ChunkData();
                     Vector3S position = new Vector3S(x, y, z);
 
-                    for (int j = 0; j < ChunkedWorldManager.chunkSize; j++)
-                        for (int i = 0; i < ChunkedWorldManager.chunkSize; i++)
-                            for (int k = 0; k < ChunkedWorldManager.chunkSize; k++)
+                    for (int j = 0; j < WorldManager.chunkSize; j++)
+                        for (int i = 0; i < WorldManager.chunkSize; i++)
+                            for (int k = 0; k < WorldManager.chunkSize; k++)
                             {
                                 int type = chunkedWorldManager.chunks[x, y, z].chunkGrid[i, j, k];
                                 if (type != 0)
@@ -88,7 +88,7 @@ public class GameManager : MonoBehaviour
 
         Vector3 playerPos = GameObject.Find("Player").transform.position;
         save.playerPosition = new Vector3S((int)playerPos.x, (int)playerPos.y, (int)playerPos.z);
-        save.heightMap = ChunkedWorldManager.heightMap;
+        save.heightMap = WorldManager.heightMap;
 
         Debug.Log("Saving game to: " + Application.persistentDataPath);
 
@@ -111,7 +111,7 @@ public class GameManager : MonoBehaviour
             SaveData save = (SaveData)bf.Deserialize(file);
             file.Close();
 
-            ChunkedWorldManager.heightMap = save.heightMap;
+            WorldManager.heightMap = save.heightMap;
 
             foreach (KeyValuePair<Vector3S, ChunkData> item in save.chunks)
             {

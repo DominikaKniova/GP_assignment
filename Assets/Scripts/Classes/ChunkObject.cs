@@ -10,7 +10,7 @@ public class ChunkObject
     public List<int> triangles = new List<int>();
     public List<Vector2> UVs = new List<Vector2>();
 
-    private const int chunkSize = ChunkedWorldManager.chunkSize;
+    private const int chunkSize = WorldManager.chunkSize;
     public byte[,,] chunkGrid = new byte[chunkSize, chunkSize, chunkSize];
 
     public Vector3Int position;
@@ -80,7 +80,7 @@ public class ChunkObject
         for (int x = 0; x < chunkSize; x++)
             for (int z = 0; z < chunkSize; z++)
             {
-                int height = ChunkedWorldManager.heightMap[x + position.x, z + position.z];
+                int height = WorldManager.heightMap[x + position.x, z + position.z];
 
                 if (position.y <= height)
                 {
@@ -115,13 +115,13 @@ public class ChunkObject
         chunkGrid[pos.x, pos.y, pos.z] = 0;
 
         // update height map
-        if ( position.y + pos.y + 1 == ChunkedWorldManager.heightMap[position.x + pos.x, position.z + pos.z])
+        if ( position.y + pos.y + 1 == WorldManager.heightMap[position.x + pos.x, position.z + pos.z])
         {
             for (int y = pos.y - 1; y >= 0; y--)
             {
                 if (chunkGrid[pos.x, pos.y, pos.z] != 0)
                 {
-                    ChunkedWorldManager.heightMap[position.x + pos.x, position.z + pos.z] = position.y + y;
+                    WorldManager.heightMap[position.x + pos.x, position.z + pos.z] = position.y + y;
                     break;
                 }
             }
@@ -137,9 +137,9 @@ public class ChunkObject
         chunkGrid[pos.x, pos.y, pos.z] = blockType;
 
         // update height map
-        if (position.y + pos.y + 1 > ChunkedWorldManager.heightMap[position.x + pos.x, position.z + pos.z])
+        if (position.y + pos.y + 1 > WorldManager.heightMap[position.x + pos.x, position.z + pos.z])
         {
-            ChunkedWorldManager.heightMap[position.x + pos.x, position.z + pos.z] = position.y + pos.y + 1;
+            WorldManager.heightMap[position.x + pos.x, position.z + pos.z] = position.y + pos.y + 1;
         }
 
         // redraw whole chunk

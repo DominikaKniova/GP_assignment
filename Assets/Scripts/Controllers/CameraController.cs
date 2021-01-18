@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CameraConstroller : MonoBehaviour
+public class CameraController : MonoBehaviour
 {
 
     private Transform playerTransform;
@@ -11,11 +11,6 @@ public class CameraConstroller : MonoBehaviour
     private float pitch = 0.0f;
     private float speed = 2.5f;
     private float rotationBound = 45.0f;
-
-    private float horizontalInput;
-    private float verticalInput;
-
-    // Start is called before the first frame update
     void Start()
     {
         playerTransform = transform.parent;
@@ -23,11 +18,8 @@ public class CameraConstroller : MonoBehaviour
 
     void Update()
     {
-        horizontalInput = Input.GetAxis("Mouse X");
-        verticalInput = Input.GetAxis("Mouse Y");
-
-        yaw += speed * horizontalInput;
-        pitch -= speed * verticalInput;
+        yaw += speed * Input.GetAxis("Mouse X"); ;
+        pitch -= speed * Input.GetAxis("Mouse Y");
 
         if (Mathf.Abs(pitch) > rotationBound)
         {

@@ -4,144 +4,200 @@ using UnityEngine;
 
 public class WorldManager : MonoBehaviour
 {
-    public GameObject[] blockPrefabs;
+    public const int chunkSize = 16;
+    public const int numChunk = 6;
+    public const int worldSize = chunkSize * numChunk;
+
+    public GameObject chunkPrefab;
     public GameObject wireframeBlockPrefab;
-    public GameObject ground;
 
-    public const int worldSize = 16 * 3;
-
-    int[,] heightMap = new int[worldSize, worldSize];
-
-    private float minX;
-    private float maxX;
-    private float minY;
-    private float maxY;
-    private float minZ;
-    private float maxZ;
-    private float cubeSize = 1.0f;
-    private float center;
-    private float step;
-    private float range;
-
+    public ChunkObject[,,] chunks = new ChunkObject[numChunk, numChunk, numChunk];
+    public static int[,] heightMap = new int[worldSize, worldSize];
     void Awake()
     {
-        List<Vector3> corners = GroundCorners();
-        minX = -corners[0].x;
-        maxX = corners[0].x;
-        minY = -corners[0].y;
-        maxY = corners[0].y;
-        minZ = -corners[0].z;
-        maxZ = corners[0].z;
+        // initialize world
+        InitChunks();
 
-        range = maxX - minX;
-        cubeSize = range / worldSize;
-        step = cubeSize;
-        center = cubeSize / 2;
-
-        //RandomTerrain();
-    }
-    private List<Vector3> GroundCorners()
-    {
-        List<Vector3> corners = new List<Vector3>(); ;
-        List<Vector3> groundVertices = new List<Vector3>(ground.GetComponent<MeshFilter>().sharedMesh.vertices);
-        corners.Add(ground.transform.TransformPoint(groundVertices[0]));
-        corners.Add(ground.transform.TransformPoint(groundVertices[10]));
-        corners.Add(ground.transform.TransformPoint(groundVertices[110]));
-        corners.Add(ground.transform.TransformPoint(groundVertices[120]));
-        groundVertices.Clear();
-        return corners;
-    }
-
-    private void RandomTerrain()
-    {
+        // generate random terrain
         heightMap = TerrainManager.GenerateHeightMap(worldSize, worldSize, 10);
-        for (int z = 0; z < worldSize; z++)
-        {
-            for (int x = 0; x < worldSize; x++)
-            {
-                for (int y = 0; y < heightMap[z, x]; y++)
+
+        FillWorldWithChunks();
+    }
+
+    private void InitChunks()
+    {
+        for (int y = 0; y < numChunk; y++)
+            for (int x = 0; x < numChunk; x++)
+                for (int z = 0; z < numChunk; z++)
                 {
-                    Vector3 spawnPosition = new Vector3(x * step + minX + center, y * step + minY + center, z * step + minZ + center);
-                    GameObject block = Instantiate(blockPrefabs[0], spawnPosition, Quaternion.identity);
-                    block.transform.localScale = new Vector3(cubeSize, cubeSize, cubeSize);
-
-                    if (y <= TerrainManager.waterLevel)
-                    {
-                        block.GetComponent<Renderer>().material.color = new Color(0, 0, 255);
-                    }
-                    else if (y > TerrainManager.greeneryLevel)
-                    {
-                        block.GetComponent<Renderer>().material.color = new Color(255, 255, 255);
-                    }
+                    chunks[x, y, z] = new ChunkObject(new Vector3(x * chunkSize, y * chunkSize, z * chunkSize), chunkPrefab);
                 }
-            }
-        }
     }
 
-    private void TestSpawning()
+    private void FillWorldWithChunks()
     {
-        for (int i = 0; i < 1; i+=2)
-        {
-            for (int j = 0; j < worldSize; j+=2)
-            {
-                for (int k = 0; k < worldSize; k+=2)
+        for (int y = 0; y < numChunk; y++)
+            for (int x = 0; x < numChunk; x++)
+                for (int z = 0; z < numChunk; z++)
                 {
-                    Vector3 spawnPosition = new Vector3(k * step + minX + center, i * step + center, j * step + minZ + center);
-                    GameObject block = Instantiate(blockPrefabs[0], spawnPosition, Quaternion.identity);
-                    block.transform.localScale = new Vector3(cubeSize, cubeSize, cubeSize);
+                    chunks[x, y, z].CreateChunkObject();
                 }
-            }
+    }
+
+    public Vector3Int World2ChunkCoords(Vector3 position)
+    {
+        Vector3Int chunkCoords = Vector3Int.FloorToInt(position);
+        chunkCoords.x /= chunkSize;
+        chunkCoords.y /= chunkSize;
+        chunkCoords.z /= chunkSize;
+        return chunkCoords;
+    }
+
+    public Vector3Int World2BlockCoords(Vector3 position)
+    {
+        Vector3Int blockCoords = Vector3Int.FloorToInt(position);
+        blockCoords.x %= chunkSize;
+        blockCoords.y %= chunkSize;
+        blockCoords.z %= chunkSize;
+        return blockCoords;
+    }
+
+    public float GetDestroyTime(RaycastHit hit)
+    {
+        // chunk position and block position in local/chunk/block coords
+        Vector3Int chunkPosition = World2ChunkCoords(hit.transform.position);
+        Vector3Int blockPosition = World2BlockCoords(hit.point - hit.normal / 2.0f);
+
+        byte type = chunks[chunkPosition.x, chunkPosition.y, chunkPosition.z].GetBlockType(blockPosition);
+
+        return BlockData.destroyTimes[BlockData.numType2string[type]];
+    }
+
+    public GameObject SnapWireframeBlock(RaycastHit hit, Vector3 playerPosition)
+    {
+        // check if hit point is out of world bounds
+        if (isOutOfWorld(hit.point)) return null;
+
+        // position of a new block in world coords
+        Vector3 blockPositionWorld = hit.point + hit.normal / 2.0f;
+
+        // get coords of a new block int block coords
+        Vector3Int blockPosition = World2BlockCoords(blockPositionWorld);
+        // get coords of the chunk where a new block will be spawned in chunk coords
+        Vector3Int chunkPosition = World2ChunkCoords(blockPositionWorld);
+
+        // show wireframe block (if player is not colliding with it)
+        if (!isCollidingWithPlayer(playerPosition, blockPosition, chunkPosition))
+        {
+            Vector3 spawnPosition = 0.5f * Vector3.one + new Vector3(chunkPosition.x * chunkSize + blockPosition.x, 
+                chunkPosition.y * chunkSize + blockPosition.y, chunkPosition.z * chunkSize + blockPosition.z);
+            
+            return Instantiate(wireframeBlockPrefab, spawnPosition, Quaternion.identity);
         }
+        return null;
     }
 
-    public void AddBlock(Vector3 position, int type)
+    public void DestroyBlock(RaycastHit hit)
     {
-        Vector3Int idx = World2Idx(position);
+        // chunk position and block position in local/chunk/block coords
+        Vector3Int chunkPosition = World2ChunkCoords(hit.transform.position);
+        Vector3Int blockPosition = World2BlockCoords(hit.point - hit.normal / 2.0f);
 
-        Vector3 spawnPosition = Idx2SpawnPosition(idx);
-
-        GameObject block = Instantiate(blockPrefabs[type], spawnPosition, Quaternion.identity);
-        block.transform.localScale = new Vector3(cubeSize, cubeSize, cubeSize);
+        chunks[chunkPosition.x, chunkPosition.y, chunkPosition.z].DestroyBlock(blockPosition);
     }
 
-    public void DestroyBlock(int x, int y, int z)
+    private bool isCollidingWithPlayer(Vector3 playerPosition, Vector3Int blockPosition, Vector3Int chunkPosition)
     {
-        // Destroy(...)
+        // get position of player in chunk and block coordinates
+        Vector3Int playerPosChunk = World2ChunkCoords(playerPosition);
+        Vector3Int playerPosBlock = World2BlockCoords(playerPosition);
+
+        if (playerPosChunk.x == chunkPosition.x && playerPosChunk.z == chunkPosition.z)
+            if (playerPosBlock.x == blockPosition.x && playerPosBlock.z == blockPosition.z)
+                return true;
+            else return false;
+        else return false;
     }
 
-    public Vector3Int World2Idx(Vector3 position)
+    private bool isOutOfWorld(Vector3 pos)
     {
-        return Vector3Int.FloorToInt(new Vector3(position.x + maxX, Mathf.Max(position.y + maxY, 0.0f), position.z + maxZ));
+        if (pos.x <= 0 || pos.x >= worldSize || pos.y <= 0 || pos.y >= worldSize || pos.z <= 0 || pos.z >= worldSize)
+            return true;
+        return false;
     }
 
-    public Vector3 Idx2SpawnPosition(Vector3Int idx)
+    public void AddBlock(RaycastHit hit, byte blockType, Vector3 playerPosition)
     {
-        return new Vector3(idx.x + minX + center, idx.y + minY + center, idx.z + minZ + center);
+        // check if hit point is out of world bounds
+        if (isOutOfWorld(hit.point)) return;
+
+        // position of a new block in world coords
+        Vector3 spawnPosition = hit.point + hit.normal / 2.0f;
+
+        // get coords of a new block int block coords
+        Vector3Int blockPosition = World2BlockCoords(spawnPosition);
+        // get coords of the chunk where a new block will be spawned in chunk coords
+        Vector3Int chunkPosition = World2ChunkCoords(spawnPosition);
+
+        // add block to chunk (if player is not colliding with the new block)
+        if ( !isCollidingWithPlayer(playerPosition, blockPosition, chunkPosition))
+            chunks[chunkPosition.x, chunkPosition.y, chunkPosition.z].AddBlock(blockPosition, blockType);
     }
 
-    public GameObject SnapWireframe(Vector3 position)
+    public int GetHeightForPosition(int x, int z)
     {
-        // convert position to grid indices
-        Vector3Int idx = Vector3Int.FloorToInt(new Vector3(position.x, Mathf.Max(position.y, 0.0f), position.z));
-        Vector3 spawnPosition = new Vector3(idx.x + center, idx.y + center, idx.z + center);
-        GameObject block = Instantiate(wireframeBlockPrefab, spawnPosition, Quaternion.identity);
-        block.transform.localScale = new Vector3(cubeSize, cubeSize, cubeSize);
-        return block;
+        return heightMap[x, z];
     }
 
-    public void ResetWorld()
+    private void ClearChunks()
+    {
+        for (int y = 0; y < numChunk; y++)
+            for (int x = 0; x < numChunk; x++)
+                for (int z = 0; z < numChunk; z++)
+                {
+                    chunks[x, y, z].ClearChunk();
+                }
+    }
+
+    private void ClearHeightMap()
+    {
+        for (int x = 0; x < worldSize; x++)
+            for (int z = 0; z < worldSize; z++)
+            {
+                heightMap[x, z] = 0;
+            }
+    }
+    public void ReGenerateWorld()
+    {
+        // destroy current world
+        ClearChunks();
+        Debug.Log("done clear");
+
+        // regenerate new height map for new terrain
+        heightMap = TerrainManager.GenerateHeightMap(worldSize, worldSize, 10);
+
+        // build new world
+        FillWorldWithChunks();
+    }
+
+    public void EmptyWorld()
     {
         // empty scene
-        foreach (GameObject block in GameObject.FindGameObjectsWithTag("Block"))
-        {
-            Destroy(block);
-        }
-        RandomTerrain();
+        ClearChunks();
     }
 
-    public int GetHeightForPosition(Vector3 position)
+    public Vector3 GetHighPosition()
     {
-        Vector3Int idx = World2Idx(position);
-        return heightMap[idx.z, idx.x];
+        // get random position in the world that is high
+        for (int x = worldSize/2; x < worldSize; x++)
+            for (int z = worldSize / 2; z < worldSize; z++)
+            {
+                if (heightMap[x, z] >= 18)
+                {
+                    return new Vector3(x, heightMap[x, z], z);
+                }
+            }
+        return Vector3.zero;
     }
+
 }

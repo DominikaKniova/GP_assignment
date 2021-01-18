@@ -21,7 +21,7 @@ public class PlayerController : MonoBehaviour
     private float rayLength = 10.0f;
 
     // build variables
-    public ChunkedWorldManager chunkedWorldManager;
+    public WorldManager chunkedWorldManager;
     private GameObject lastWireframeBlock;
     private Vector3 centerScreenPoint;
     private bool buildMode = false;
@@ -173,8 +173,8 @@ public class PlayerController : MonoBehaviour
 
     private bool isOnWorldEdge()
     {
-        if (transform.position.x < 0 || transform.position.x > ChunkedWorldManager.worldSize 
-            || transform.position.z < 0 || transform.position.z > ChunkedWorldManager.worldSize)
+        if (transform.position.x < 0 || transform.position.x > WorldManager.worldSize 
+            || transform.position.z < 0 || transform.position.z > WorldManager.worldSize)
         {
             Debug.Log("On edge");
             return true;
@@ -190,7 +190,7 @@ public class PlayerController : MonoBehaviour
         if (highPosition.Equals(Vector3.zero))
         {
             // nothing high was found, so position the player in the center of world
-            float worldCenter = ChunkedWorldManager.worldSize / 2.0f;
+            float worldCenter = WorldManager.worldSize / 2.0f;
             transform.position = worldCenter * (Vector3.right + Vector3.forward);
             int height = chunkedWorldManager.GetHeightForPosition((int)transform.position.x, (int)transform.position.z);
             transform.position += (height + 2) * Vector3.up;
@@ -202,8 +202,8 @@ public class PlayerController : MonoBehaviour
     }
     private Vector3 GetPositionInNewWorld()
     {
-        float x = Mathf.Repeat(transform.position.x, ChunkedWorldManager.worldSize);
-        float z = Mathf.Repeat(transform.position.z, ChunkedWorldManager.worldSize);
+        float x = Mathf.Repeat(transform.position.x, WorldManager.worldSize);
+        float z = Mathf.Repeat(transform.position.z, WorldManager.worldSize);
         int y = chunkedWorldManager.GetHeightForPosition((int) x, (int) z);
         return new Vector3(x, y + 2, z);
     }

@@ -73,6 +73,9 @@ public class ChunkedWorldManager : MonoBehaviour
 
     public GameObject SnapWireframeBlock(RaycastHit hit, Vector3 playerPosition)
     {
+        // check if hit point is out of world bounds
+        if (isOutOfWorld(hit.point)) return null;
+
         // position of a new block in world coords
         Vector3 blockPositionWorld = hit.point + hit.normal / 2.0f;
 
@@ -114,8 +117,18 @@ public class ChunkedWorldManager : MonoBehaviour
         else return false;
     }
 
+    private bool isOutOfWorld(Vector3 pos)
+    {
+        if (pos.x <= 0 || pos.x >= worldSize || pos.y <= 0 || pos.y >= worldSize || pos.z <= 0 || pos.z >= worldSize)
+            return true;
+        return false;
+    }
+
     public void AddBlock(RaycastHit hit, int blockType, Vector3 playerPosition)
     {
+        // check if hit point is out of world bounds
+        if (isOutOfWorld(hit.point)) return;
+
         // position of a new block in world coords
         Vector3 spawnPosition = hit.point + hit.normal / 2.0f;
 

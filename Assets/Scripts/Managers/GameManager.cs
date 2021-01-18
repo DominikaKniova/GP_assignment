@@ -11,9 +11,14 @@ public class GameManager : MonoBehaviour
     public GameObject pauseMenu;
     public GameObject gameplayUI;
 
+    public static bool isBuildMode;
+    public static byte currentBlockType = 1;
+
     private bool inGameScene;
 
     private string saveFileName = "gamesave.save";
+
+
     private void Start()
     {
         if (SceneManager.GetActiveScene().name == "GameScene")
@@ -27,8 +32,16 @@ public class GameManager : MonoBehaviour
     void Update()
     {
         if (inGameScene)
+        {
             if (Input.GetKeyDown(KeyCode.Escape))
-                    SwitchModes();   
+                SwitchModes();
+
+            if (Input.GetKeyDown(KeyCode.B))
+                isBuildMode = !isBuildMode;
+
+            UpdateBuildBlockType();
+        }
+            
     }
 
     private void SwitchModes()
@@ -61,6 +74,26 @@ public class GameManager : MonoBehaviour
         gameplayUI.SetActive(true);
         foreach (GameObject chunk in GameObject.FindGameObjectsWithTag("Chunk"))
             chunk.GetComponent<MeshRenderer>().enabled = true;
+    }
+
+    private void UpdateBuildBlockType()
+    {
+        if (Input.GetKeyDown(KeyCode.Alpha1))
+        {
+            currentBlockType = 1;
+        }
+        else if (Input.GetKeyDown(KeyCode.Alpha2))
+        {
+            currentBlockType = 2;
+        }
+        else if (Input.GetKeyDown(KeyCode.Alpha3))
+        {
+            currentBlockType = 3;
+        }
+        else if (Input.GetKeyDown(KeyCode.Alpha4))
+        {
+            currentBlockType = 4;
+        }
     }
 
     public void StartGame()

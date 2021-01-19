@@ -19,6 +19,7 @@ public class PlayerController : MonoBehaviour
 
     // raycast variables
     private float rayLength = 10.0f;
+    private float colliderExtentY;
 
     // build variables
     public WorldManager worldManager;
@@ -39,6 +40,7 @@ public class PlayerController : MonoBehaviour
     {
         playerRb = GetComponent<Rigidbody>();
         capsCollider = GetComponent<CapsuleCollider>();
+        colliderExtentY = capsCollider.bounds.extents.y;
         centerScreenPoint = new Vector3(Camera.main.pixelWidth / 2.0f, Camera.main.pixelHeight / 2.0f, 0);
         stepsAudio = GetComponent<AudioSource>();
 
@@ -134,7 +136,7 @@ public class PlayerController : MonoBehaviour
     /* Check if player is standing on the ground */
     private bool IsGrounded()
     {
-        return Physics.Raycast(transform.position, -Vector3.up, capsCollider.bounds.extents.y + 0.1f);
+        return Physics.Raycast(transform.position, -Vector3.up, colliderExtentY + 0.1f);
     }
     
     

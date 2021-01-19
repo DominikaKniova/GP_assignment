@@ -51,6 +51,9 @@ public class PlayerController : MonoBehaviour
     {
         Destroy(lastWireframeBlock);
 
+        // skip update when game is paused
+        if (Time.timeScale == 0) return;
+
         GetMovementInputs();
 
         HandleAudio();

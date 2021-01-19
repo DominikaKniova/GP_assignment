@@ -254,6 +254,8 @@ MonoBehaviour:
   worldManager: {fileID: 1439463470}
   pauseMenu: {fileID: 1277024273}
   gameplayUI: {fileID: 1565594900}
+  isBuildMode: 0
+  currentBlockType: 1
 --- !u!4 &1277316267
 Transform:
   m_ObjectHideFlags: 0
@@ -606,6 +608,11 @@ PrefabInstance:
       propertyPath: pauseMenu
       value: 
       objectReference: {fileID: 1277024273}
+    - target: {fileID: 1672497581232099728, guid: eb74ff5e86ef2c34ab2384689db4f977,
+        type: 3}
+      propertyPath: gameManager
+      value: 
+      objectReference: {fileID: 1277316266}
     - target: {fileID: 1672497581232099728, guid: eb74ff5e86ef2c34ab2384689db4f977,
         type: 3}
       propertyPath: progressBar

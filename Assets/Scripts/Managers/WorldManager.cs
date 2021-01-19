@@ -187,7 +187,6 @@ public class WorldManager : MonoBehaviour
             }
     }
 
-
     /* Create new world with new random height map */
     public void ReGenerateWorld()
     {

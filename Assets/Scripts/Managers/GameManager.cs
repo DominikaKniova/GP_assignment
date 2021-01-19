@@ -11,13 +11,16 @@ public class GameManager : MonoBehaviour
     public GameObject pauseMenu;
     public GameObject gameplayUI;
 
-    public static bool isBuildMode;
-    public static byte currentBlockType = 1;
+    public bool isBuildMode;
+    public byte currentBlockType = 1;
 
     private bool inGameScene;
 
     private string saveFileName = "gamesave.save";
+    private string sectorFileNamePref = "sector";
+    private string sectorFileNameSuf = ".save";
 
+    private Vector2Int currentSector = Vector2Int.zero;
 
     private void Start()
     {
@@ -163,7 +166,7 @@ public class GameManager : MonoBehaviour
                 Vector3S chunkPos = item.Key;
                 ChunkData chunkData = item.Value;
 
-                worldManager.chunks[chunkPos.x, chunkPos.y, chunkPos.z].ReCreateChunkFromSave(ref chunkData, chunkPos);
+                worldManager.chunks[chunkPos.x, chunkPos.y, chunkPos.z].ReCreateChunkFromSave(chunkData, chunkPos);
             }
 
             // position player
@@ -172,7 +175,7 @@ public class GameManager : MonoBehaviour
             Debug.Log("Loading successful");
         }
         else
-            Debug.LogError("Loading unsuccessful");
+            Debug.Log("Loading unsuccessful");
 
         SwitchModes();
     }
@@ -185,5 +188,107 @@ public class GameManager : MonoBehaviour
     public void Exit()
     {
         Application.Quit();
+    }
+
+    /* Bonus task */
+    public Vector2Int GetNewSectorPosition(Vector3 playerPos)
+    {
+        Vector2Int newSectorPos = currentSector;
+        if (playerPos.x < 0)
+            newSectorPos += Vector2Int.left;
+
+        if (playerPos.x > WorldManager.worldSize)
+            newSectorPos += Vector2Int.right;
+
+        if (playerPos.z < 0)
+            newSectorPos += Vector2Int.down;
+
+        if (playerPos.z > WorldManager.worldSize)
+            newSectorPos += Vector2Int.up;
+
+        return newSectorPos;
+    }
+
+    /* Bonus task */
+    /* Load sector from file */
+    public bool LoadSector(Vector2Int sectorPos)
+    {
+        string sector = sectorPos.x.ToString() + sectorPos.y.ToString();
+        string path = Application.persistentDataPath + "/" + sectorFileNamePref + sector + sectorFileNameSuf;
+        // update current sector position
+        currentSector = sectorPos;
+
+        if (!File.Exists(path))
+        {
+            // sector does not exist
+            Debug.Log("Sector " + currentSector + " does not exist, generate new one");
+            return false;
+        }
+
+        // clear current world
+        worldManager.EmptyWorld();
+
+        BinaryFormatter bf = new BinaryFormatter();
+        FileStream file = File.Open(path, FileMode.Open);
+        SaveData save = (SaveData)bf.Deserialize(file);
+        file.Close();
+
+        // recreate chunks
+        foreach (KeyValuePair<Vector3S, ChunkData> item in save.chunks)
+        {
+            Vector3S chunkPos = item.Key;
+            ChunkData chunkData = item.Value;
+
+            worldManager.chunks[chunkPos.x, chunkPos.y, chunkPos.z].ReCreateChunkFromSave(chunkData, chunkPos);
+        }
+
+        Debug.Log("Sector " + currentSector + " loaded");
+
+        return true;
+    }
+
+    /* Bonus task */
+    /* Save current sector to file */
+    public void SaveSector()
+    {
+        string sector = currentSector.x.ToString() + currentSector.y.ToString();
+        string path = Application.persistentDataPath + "/" + sectorFileNamePref + sector + sectorFileNameSuf;
+
+        // do not save if sector already stored
+        if (!File.Exists(path))
+        {
+            SaveData save = new SaveData();
+
+            for (int y = WorldManager.numChunks - 1; y >= 0; y--)
+                for (int x = 0; x < WorldManager.numChunks; x++)
+                    for (int z = 0; z < WorldManager.numChunks; z++)
+                    {
+                        ChunkData chunkData = new ChunkData();
+                        Vector3S position = new Vector3S(x, y, z);
+
+                        for (int j = WorldManager.chunkSize - 1; j >= 0; j--)
+                            for (int i = 0; i < WorldManager.chunkSize; i++)
+                                for (int k = 0; k < WorldManager.chunkSize; k++)
+                                {
+                                    byte type = worldManager.chunks[x, y, z].chunkGrid[i, j, k];
+                                    if (type != 0)
+                                    {
+                                        // store only occupied blocks
+                                        chunkData.blockPositions.Add(new Vector3S(i, j, k));
+                                        chunkData.blockTypes.Add(type);
+                                    }
+                                }
+                        // chunk stored in dictionary with its position as key
+                        save.chunks.Add(position, chunkData);
+                    }
+
+            Debug.Log("Saving sector " + currentSector + " to: " + path);
+            BinaryFormatter bf = new BinaryFormatter();
+            FileStream file = File.Create(path);
+            bf.Serialize(file, save);
+            file.Close();
+        }
+        else
+            Debug.Log("Sector " + currentSector + " already saved");
     }
 }

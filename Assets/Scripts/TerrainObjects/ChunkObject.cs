@@ -178,7 +178,7 @@ public class ChunkObject
     }
 
     /* Create chunk's geometry from saved file */
-    public void ReCreateChunkFromSave(ref ChunkData chunkData, Vector3S chunkPosition)
+    public void ReCreateChunkFromSave(ChunkData chunkData, Vector3S chunkPosition)
     {
         for (int i = 0; i < chunkData.blockPositions.Count; i++)
         {
@@ -188,8 +188,11 @@ public class ChunkObject
             int height = chunkPosition.y + chunkData.blockPositions[i].y;
             int x = chunkPosition.x + chunkData.blockPositions[i].x;
             int z = chunkPosition.z + chunkData.blockPositions[i].z;
-            if (height > WorldManager.heightMap[x, z])
-                WorldManager.heightMap[x, z] = height;
+            if (height + 1 > WorldManager.heightMap[x, z])
+            {
+                WorldManager.heightMap[x, z] = height + 1;
+            }
+
 
         }
         CreateChunkObject(false);

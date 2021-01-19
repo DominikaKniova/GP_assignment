@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
+    public GameManager gameManager;
 
     // movement variables
     private Rigidbody playerRb;
@@ -47,6 +48,7 @@ public class PlayerController : MonoBehaviour
         // position the player
         SetInitPlayerPosition();
     }
+
     void Update()
     {
         Destroy(lastWireframeBlock);
@@ -57,12 +59,13 @@ public class PlayerController : MonoBehaviour
 
         if (isOnWorldBorder())
         {
-            // generate new world and set new player position
-            worldManager.ReGenerateWorld();
+            // generate new world sector or load already visited one
+            LoadNewSector();
+            // update player position
             transform.position = GetPositionInNewWorld();
         }
 
-        if (GameManager.isBuildMode)
+        if (gameManager.isBuildMode)
         {
             if (isDestroying && Input.GetMouseButton(1))
             {
@@ -151,6 +154,22 @@ public class PlayerController : MonoBehaviour
         return false;
     }
 
+    /* Bonus task */
+    private void LoadNewSector()
+    {
+        // first try to save current sector
+        gameManager.SaveSector();
+
+        // get position of the new sector
+        Vector2Int newSectorPos = gameManager.GetNewSectorPosition(transform.position);
+
+        if ( ! gameManager.LoadSector(newSectorPos))
+        {
+            // this sector has not been visited so generate new one
+            worldManager.ReGenerateWorld();
+        }
+    }
+
     private void SetInitPlayerPosition()
     {
         // try to position the player somewhere high 
@@ -160,7 +179,7 @@ public class PlayerController : MonoBehaviour
         {
             // nothing high was found, so position the player in the center of world
             float worldCenter = WorldManager.worldSize / 2.0f;
-            transform.position = worldCenter * (Vector3.right + Vector3.forward);
+            transform.position = worldCenter * (Vector3.right + Vector3.forward) + +0.5f * Vector3.one;
             int height = worldManager.GetHeightForPosition((int)transform.position.x, (int)transform.position.z);
             transform.position += (height + 2) * Vector3.up;
         }
@@ -173,10 +192,10 @@ public class PlayerController : MonoBehaviour
     /* When player passed world border, position it correctly at the "beginning" of new world */
     private Vector3 GetPositionInNewWorld()
     {
-        float x = Mathf.Repeat(transform.position.x, WorldManager.worldSize);
-        float z = Mathf.Repeat(transform.position.z, WorldManager.worldSize);
-        int y = worldManager.GetHeightForPosition((int) x, (int) z);
-        return new Vector3(x, y + 2, z);
+        int x = (int) Mathf.Repeat(transform.position.x + WorldManager.worldSize, WorldManager.worldSize);
+        int z = (int) Mathf.Repeat(transform.position.z + WorldManager.worldSize, WorldManager.worldSize);
+        int y = worldManager.GetHeightForPosition(x, z);
+        return new Vector3(x + 0.5f, y + 2, z + 0.5f);
     }
     
     private bool CastRay(out RaycastHit hit)
@@ -197,7 +216,7 @@ public class PlayerController : MonoBehaviour
     {
         if (hit.collider.tag == "Chunk")
         {
-            worldManager.AddBlock(hit, GameManager.currentBlockType, transform.position);
+            worldManager.AddBlock(hit, gameManager.currentBlockType, transform.position);
         }
     }
     private void DestroyBlock(RaycastHit hit)

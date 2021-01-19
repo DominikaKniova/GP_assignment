@@ -54,6 +54,12 @@ public class ChunkObject
             for (int z = 0; z < chunkSize; z++)
             {
                 int height = WorldManager.heightMap[x + position.x, z + position.z];
+                if (height == 0)
+                {
+                    // height cannot be 0
+                    WorldManager.heightMap[x + position.x, z + position.z]++;
+                    height++;
+                }
                 if (position.y <= height)
                 {
                     height = position.y + chunkSize <= height ? chunkSize : height % chunkSize;

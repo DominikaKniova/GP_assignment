@@ -118,19 +118,6 @@ public class ChunkObject
         // set occupied block as empty
         chunkGrid[pos.x, pos.y, pos.z] = 0;
 
-        // update height map
-        if ( position.y + pos.y + 1 == WorldManager.heightMap[position.x + pos.x, position.z + pos.z])
-        {
-            for (int y = pos.y - 1; y >= 0; y--)
-            {
-                if (chunkGrid[pos.x, pos.y, pos.z] != 0)
-                {
-                    WorldManager.heightMap[position.x + pos.x, position.z + pos.z] = position.y + y;
-                    break;
-                }
-            }
-        }
-
         // redraw whole chunk
         ReCreateChunkObject();
     }
@@ -139,12 +126,6 @@ public class ChunkObject
     {
         // set empty block as occupied (with its new type)
         chunkGrid[pos.x, pos.y, pos.z] = blockType;
-
-        // update height map
-        if (position.y + pos.y + 1 > WorldManager.heightMap[position.x + pos.x, position.z + pos.z])
-        {
-            WorldManager.heightMap[position.x + pos.x, position.z + pos.z] = position.y + pos.y + 1;
-        }
 
         // redraw whole chunk
         if (recreateChunk) ReCreateChunkObject();
@@ -183,14 +164,6 @@ public class ChunkObject
         for (int i = 0; i < chunkData.blockPositions.Count; i++)
         {
             chunkGrid[chunkData.blockPositions[i].x, chunkData.blockPositions[i].y, chunkData.blockPositions[i].z] = chunkData.blockTypes[i];
-
-            // update height map
-            int height = chunkPosition.y + chunkData.blockPositions[i].y;
-            int x = chunkPosition.x + chunkData.blockPositions[i].x;
-            int z = chunkPosition.z + chunkData.blockPositions[i].z;
-            if (height > WorldManager.heightMap[x, z])
-                WorldManager.heightMap[x, z] = height;
-
         }
         CreateChunkObject(false);
     }

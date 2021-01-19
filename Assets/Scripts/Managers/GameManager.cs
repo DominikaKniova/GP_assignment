@@ -24,9 +24,10 @@ public class GameManager : MonoBehaviour
         if (SceneManager.GetActiveScene().name == "GameScene")
         {
             inGameScene = true;
-            Cursor.visible = false;
+            Cursor.lockState = CursorLockMode.Locked;
         }
-
+        else
+            inGameScene = false;
     }
 
     void Update()
@@ -49,17 +50,17 @@ public class GameManager : MonoBehaviour
     {
         if (Time.timeScale == 1)
         {
-            Cursor.visible = true;
             HideScene();
+            Cursor.lockState = CursorLockMode.Confined;
             pauseMenu.SetActive(true);
             Time.timeScale = 0;
         }
         else
         {
-            Cursor.visible = false;
             UnhideScene();
             pauseMenu.SetActive(false);
             Time.timeScale = 1;
+            Cursor.lockState = CursorLockMode.Locked;
         }
     }
 

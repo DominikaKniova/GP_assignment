@@ -11,7 +11,7 @@ public class CameraController : MonoBehaviour
     private float yaw = 0.0f;
     private float pitch = 0.0f;
     private float speed = 2.5f;
-    private float rotationBound = 60.0f;
+    private float rotationBound = 90.0f;
 
     void Start()
     {

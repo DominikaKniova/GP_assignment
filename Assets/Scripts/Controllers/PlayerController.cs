@@ -12,6 +12,10 @@ public class PlayerController : MonoBehaviour
     private float playerSpeed = 3f;
     private float jumpForce = 5;
     private bool doJump;
+    private bool isGrounded = true;
+
+    // audio
+    private AudioSource stepsAudio;
 
     // raycast variables
     private float rayLength = 10.0f;
@@ -36,6 +40,7 @@ public class PlayerController : MonoBehaviour
         playerRb = GetComponent<Rigidbody>();
         capsCollider = GetComponent<CapsuleCollider>();
         centerScreenPoint = new Vector3(Camera.main.pixelWidth / 2.0f, Camera.main.pixelHeight / 2.0f, 0);
+        stepsAudio = GetComponent<AudioSource>();
 
         // position the player
         SetInitPlayerPosition();
@@ -45,6 +50,8 @@ public class PlayerController : MonoBehaviour
         Destroy(lastWireframeBlock);
 
         GetMovementInputs();
+
+        HandleAudio();
 
         if (isOnWorldBorder())
         {
@@ -90,10 +97,26 @@ public class PlayerController : MonoBehaviour
 
     private void GetMovementInputs()
     {
-        if (Input.GetKeyDown(KeyCode.Space) && IsGrounded())
+        if (IsGrounded())
+            isGrounded = true;
+        else
+            isGrounded = false;
+
+        if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
             doJump = true;
         
         moveDirection = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
+    }
+
+    private void HandleAudio()
+    {
+        if (isGrounded && !moveDirection.Equals(Vector3.zero))
+        {
+            if (!stepsAudio.isPlaying)
+                stepsAudio.Play();
+        }
+        else
+            stepsAudio.Stop();
     }
 
     private void MovePlayer()

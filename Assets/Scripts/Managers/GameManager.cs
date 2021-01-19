@@ -172,7 +172,7 @@ public class GameManager : MonoBehaviour
             Debug.Log("Loading successful");
         }
         else
-            Debug.LogError("Loading unsuccessful");
+            Debug.Log("Loading unsuccessful");
 
         SwitchModes();
     }

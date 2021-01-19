@@ -203,8 +203,9 @@ public class WorldManager : MonoBehaviour
 
     public void EmptyWorld()
     {
-        // destroy current world
+        // destroy current world and its height map
         ClearChunks();
+        ClearHeightMap();
     }
 
 

@@ -251,7 +251,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0067998b3d7cb3e43b4033c27065d9c5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  chunkedWorldManager: {fileID: 1439463470}
+  worldManager: {fileID: 1439463470}
   pauseMenu: {fileID: 1277024273}
   gameplayUI: {fileID: 1565594900}
 --- !u!4 &1277316267

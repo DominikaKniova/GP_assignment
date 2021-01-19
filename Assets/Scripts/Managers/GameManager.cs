@@ -7,7 +7,7 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
-    public WorldManager chunkedWorldManager;
+    public WorldManager worldManager;
     public GameObject pauseMenu;
     public GameObject gameplayUI;
 
@@ -107,18 +107,18 @@ public class GameManager : MonoBehaviour
     {
         SaveData save = new SaveData();
 
-        for (int y = 0; y < WorldManager.numChunks; y++)
+        for (int y = WorldManager.numChunks - 1; y >=0; y--)
             for (int x = 0; x < WorldManager.numChunks; x++)
                 for (int z = 0; z < WorldManager.numChunks; z++)
                 {
                     ChunkData chunkData = new ChunkData();
                     Vector3S position = new Vector3S(x, y, z);
 
-                    for (int j = 0; j < WorldManager.chunkSize; j++)
+                    for (int j = WorldManager.chunkSize - 1; j >= 0; j--)
                         for (int i = 0; i < WorldManager.chunkSize; i++)
                             for (int k = 0; k < WorldManager.chunkSize; k++)
                             {
-                                byte type = chunkedWorldManager.chunks[x, y, z].chunkGrid[i, j, k];
+                                byte type = worldManager.chunks[x, y, z].chunkGrid[i, j, k];
                                 if (type != 0)
                                 {
                                     // store only occupied blocks
@@ -130,10 +130,9 @@ public class GameManager : MonoBehaviour
                     save.chunks.Add(position, chunkData);
                 }
 
-        // store player's position and heightMap
+        // store player's position
         Vector3 playerPos = GameObject.Find("Player").transform.position;
         save.playerPosition = new Vector3S((int)playerPos.x, (int)playerPos.y, (int)playerPos.z);
-        save.heightMap = WorldManager.heightMap;
 
         Debug.Log("Saving game state to: " + Application.persistentDataPath);
         BinaryFormatter bf = new BinaryFormatter();
@@ -150,14 +149,12 @@ public class GameManager : MonoBehaviour
         if (File.Exists(Application.persistentDataPath + "/" + saveFileName))
         {
             // clear current world
-            chunkedWorldManager.EmptyWorld();
+            worldManager.EmptyWorld();
 
             BinaryFormatter bf = new BinaryFormatter();
             FileStream file = File.Open(Application.persistentDataPath + "/" + saveFileName, FileMode.Open);
             SaveData save = (SaveData)bf.Deserialize(file);
             file.Close();
-
-            WorldManager.heightMap = save.heightMap;
 
             // recreate chunks
             foreach (KeyValuePair<Vector3S, ChunkData> item in save.chunks)
@@ -165,7 +162,7 @@ public class GameManager : MonoBehaviour
                 Vector3S chunkPos = item.Key;
                 ChunkData chunkData = item.Value;
 
-                chunkedWorldManager.chunks[chunkPos.x, chunkPos.y, chunkPos.z].ReCreateChunkFromSave(ref chunkData);
+                worldManager.chunks[chunkPos.x, chunkPos.y, chunkPos.z].ReCreateChunkFromSave(ref chunkData, chunkPos);
             }
 
             // position player

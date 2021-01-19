@@ -9,6 +9,7 @@ Library/
 Assets/AssetStoreTools*
 .vs/
 build_win/
+build_linux/
 
 # ===================================== #
 # Visual Studio / MonoDevelop generated #
@@ -23,6 +24,9 @@ ExportedObj/
 *.user
 *.unityproj
 *.booproj
+*.vsconfig
+
+*.zip
 
 # ============ #
 # OS generated #

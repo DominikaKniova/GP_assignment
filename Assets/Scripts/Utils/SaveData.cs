@@ -36,6 +36,5 @@ public class ChunkData
 public class SaveData
 {
     public Dictionary<Vector3S, ChunkData> chunks = new Dictionary<Vector3S, ChunkData>();
-    public int[,] heightMap = new int[WorldManager.worldSize, WorldManager.worldSize];
     public Vector3S playerPosition;
 }
